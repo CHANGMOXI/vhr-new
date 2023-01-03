@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.changmoxi.vhr.mapper.HrMapper" >
+
   <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.Hr" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
@@ -13,29 +14,34 @@
     <result column="userface" property="userface" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
   </resultMap>
+
   <sql id="Base_Column_List" >
     id, name, phone, telephone, address, enabled, username, password, userface, remark
   </sql>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from hr
     where id = #{id,jdbcType=INTEGER}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from hr
     where id = #{id,jdbcType=INTEGER}
   </delete>
+
   <insert id="insert" parameterType="org.changmoxi.vhr.model.Hr" >
-    insert into hr (id, name, phone, 
-      telephone, address, enabled, 
-      username, password, userface, 
+    insert into hr (id, name, phone,
+      telephone, address, enabled,
+      username, password, userface,
       remark)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=CHAR}, 
-      #{telephone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, 
-      #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{userface,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=CHAR},
+      #{telephone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT},
+      #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{userface,jdbcType=VARCHAR},
       #{remark,jdbcType=VARCHAR})
   </insert>
+
   <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Hr" >
     insert into hr
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -103,6 +109,7 @@
       </if>
     </trim>
   </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.Hr" >
     update hr
     <set >
@@ -136,6 +143,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+
   <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.Hr" >
     update hr
     set name = #{name,jdbcType=VARCHAR},
@@ -149,4 +157,8 @@
       remark = #{remark,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByUsername" resultType="org.changmoxi.vhr.model.Hr" resultMap="BaseResultMap">
+    select * from hr where username = #{username}
+  </select>
 </mapper>

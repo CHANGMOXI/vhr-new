@@ -1,6 +1,14 @@
 package org.changmoxi.vhr.model;
 
-public class Hr {
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+
+/**
+ * Hr用户类
+ */
+public class Hr implements UserDetails {
     private Integer id;
 
     private String name;
@@ -20,6 +28,78 @@ public class Hr {
     private String userface;
 
     private String remark;
+
+    /**
+     * 账号是否没有过期
+     *
+     * @return
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        //true: 没有过期
+        return true;
+    }
+
+    /**
+     * 账号是否没有被锁定
+     *
+     * @return
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        //true: 没有被锁定
+        return true;
+    }
+
+    /**
+     * 密码是否没有过期
+     *
+     * @return
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        //true: 没有过期
+        return true;
+    }
+
+    /**
+     * 是否可用
+     *
+     * @return
+     */
+    @Override
+    public boolean isEnabled() {
+        //返回自己的enabled字段
+        return enabled;
+    }
+
+    /**
+     * 返回用户的所有角色
+     *
+     * @return
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password == null ? null : password.trim();
+    }
 
     public Integer getId() {
         return id;
@@ -61,28 +141,8 @@ public class Hr {
         this.address = address == null ? null : address.trim();
     }
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password == null ? null : password.trim();
     }
 
     public String getUserface() {

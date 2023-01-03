@@ -4,3 +4,6 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     username: root
     password: 123456
+
+server:
+  port: 8081
