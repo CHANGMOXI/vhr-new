@@ -2,6 +2,8 @@ package org.changmoxi.vhr.mapper;
 
 import org.changmoxi.vhr.model.Menu;
 
+import java.util.List;
+
 public interface MenuMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,6 @@ public interface MenuMapper {
     int updateByPrimaryKeySelective(Menu record);
 
     int updateByPrimaryKey(Menu record);
+
+    List<Menu> getMenusByHrId(Integer id);
 }
