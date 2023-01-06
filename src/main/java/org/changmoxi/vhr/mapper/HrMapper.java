@@ -1,6 +1,9 @@
 package org.changmoxi.vhr.mapper;
 
 import org.changmoxi.vhr.model.Hr;
+import org.changmoxi.vhr.model.Role;
+
+import java.util.List;
 
 public interface HrMapper {
     int deleteByPrimaryKey(Integer id);
@@ -16,4 +19,6 @@ public interface HrMapper {
     int updateByPrimaryKey(Hr record);
 
     Hr selectByUsername(String username);
+
+    List<Role> getHrRolesById(Integer id);
 }

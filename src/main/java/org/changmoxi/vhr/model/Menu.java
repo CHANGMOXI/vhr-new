@@ -29,6 +29,11 @@ public class Menu {
      */
     private List<Menu> children;
 
+    /**
+     * 菜单项所需的用户角色
+     */
+    private List<Role> roles;
+
     public Integer getId() {
         return id;
     }
@@ -107,5 +112,13 @@ public class Menu {
 
     public void setChildren(List<Menu> children) {
         this.children = children;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

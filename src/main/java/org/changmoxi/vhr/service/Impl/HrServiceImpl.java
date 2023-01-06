@@ -32,6 +32,8 @@ public class HrServiceImpl implements HrService {
         if (Objects.isNull(hr)) {
             throw new UsernameNotFoundException("用户名不存在!");
         }
+        //用户存在，设置其具备的角色
+        hr.setRoles(hrMapper.getHrRolesById(hr.getId()));
         return hr;
     }
 }

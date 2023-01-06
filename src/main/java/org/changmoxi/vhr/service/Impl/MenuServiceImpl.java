@@ -24,4 +24,10 @@ public class MenuServiceImpl implements MenuService {
         Integer id = ((Hr) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return menuMapper.getMenusByHrId(id);
     }
+
+    @Override
+//    @Cacheable//菜单项数据很少变化，每次请求都查询数据库不太合理，可以加入缓存Spring Cache
+    public List<Menu> getAllMenusWithRoles() {
+        return menuMapper.getAllMenusWithRoles();
+    }
 }

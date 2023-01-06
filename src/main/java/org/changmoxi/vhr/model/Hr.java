@@ -1,9 +1,12 @@
 package org.changmoxi.vhr.model;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Hr用户类
@@ -28,6 +31,11 @@ public class Hr implements UserDetails {
     private String userface;
 
     private String remark;
+
+    /**
+     * 用户所具备的角色
+     */
+    private List<Role> roles;
 
     /**
      * 账号是否没有过期
@@ -74,13 +82,17 @@ public class Hr implements UserDetails {
     }
 
     /**
-     * 返回用户的所有角色
+     * 返回用户所具备的角色
      *
      * @return
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>(roles.size());
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return authorities;
     }
 
     @Override
@@ -159,5 +171,13 @@ public class Hr implements UserDetails {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

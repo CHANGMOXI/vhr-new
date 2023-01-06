@@ -36,6 +36,15 @@
         </collection>
     </resultMap>
 
+    <resultMap id="MenusWithRoles" type="org.changmoxi.vhr.model.Menu" extends="BaseResultMap">
+        <!--复杂属性的映射需要另外处理，集合(一对多)用collection-->
+        <collection property="roles" ofType="org.changmoxi.vhr.model.Role">
+            <id column="rid" property="id" jdbcType="INTEGER"/>
+            <result column="rname" property="name" jdbcType="VARCHAR"/>
+            <result column="rnameZh" property="nameZh" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         id
         , url, path, component, name, iconCls, keepAlive, requireAuth, parentId, enabled
@@ -62,6 +71,16 @@
           and m2.`enabled` = true
           and hrr.`hrid` = #{id}
         order by m1.`id`, m2.`id`
+    </select>
+
+    <select id="getAllMenusWithRoles" resultMap="MenusWithRoles">
+        select m.*, r.`id` rid, r.`name` rname, r.`nameZh` rnameZh
+        from menu m,
+             menu_role mr,
+             role r
+        where m.`id` = mr.`mid`
+          and mr.`rid` = r.`id`
+        order by m.`id`
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">

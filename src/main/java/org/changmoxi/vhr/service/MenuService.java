@@ -15,4 +15,11 @@ public interface MenuService {
      * @return
      */
     List<Menu> getMenusByHrId();
+
+    /**
+     * 获取所有带有所需用户角色的菜单项数据
+     *
+     * @return
+     */
+    List<Menu> getAllMenusWithRoles();
 }
