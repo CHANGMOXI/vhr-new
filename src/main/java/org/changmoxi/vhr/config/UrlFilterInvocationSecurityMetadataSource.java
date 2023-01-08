@@ -3,7 +3,6 @@ package org.changmoxi.vhr.config;
 import org.changmoxi.vhr.model.Menu;
 import org.changmoxi.vhr.model.Role;
 import org.changmoxi.vhr.service.MenuService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -11,6 +10,7 @@ import org.springframework.security.web.access.intercept.FilterInvocationSecurit
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
  **/
 @Component
 public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
-    @Autowired
+    @Resource
     private MenuService menuService;
 
     /**
@@ -41,8 +41,8 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
         //未登录的非法请求的第二种解决方案:
-        //对返回登录页面的/login请求放行，否则未登录的请求抛异常返回登录页面会陷入/login请求死循环，因为/login也被拦截
-        //采用第三种解决方案，直接不进行重定向/login，直接返回JSON提示，所以不需要在这里放行
+        //---> 对返回登录页面的/login请求返回null来放行，否则未登录的请求抛异常返回登录页面会陷入/login请求死循环，因为/login也被拦截
+        //这里采用第三种解决方案，直接不进行重定向/login，直接返回JSON提示，所以不需要在这里放行
 //        if ("/login".equals(requestUrl)) {
 //            return null;
 //        }
@@ -59,7 +59,7 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
         }
         //没有匹配上的两种处理方案:
         //①不允许访问，非法访问 ---> 如果返回null，AbstractSecurityInterceptor对象的rejectPublicInvocations属性，该属性默认为false
-        //                      ---> 可以配置该属性为true，表示返回null时，请求不能访问
+        //                      ---> 在SecurityConfig的configure(HttpSecurity)方法中通过withObjectPostProcessor来设置该属性为true，表示返回null时，请求不能访问
         //                   ---> 或者 返回一个临时角色，在自定义的AccessDecisionManager实现类中不给放行
         //②没有匹配上的，统一需要登录之后才能访问 ---> 返回一个临时角色，在自定义的AccessDecisionManager实现类中处理
         //这里采用第②种，所以返回"ROLE_NEED_LOGIN"的临时角色

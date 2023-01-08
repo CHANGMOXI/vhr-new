@@ -1,13 +1,14 @@
-package org.changmoxi.vhr.controller;
+package org.changmoxi.vhr.controller.config;
 
+import org.changmoxi.vhr.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.Menu;
-import org.changmoxi.vhr.model.Result;
+import org.changmoxi.vhr.model.RespBean;
 import org.changmoxi.vhr.service.MenuService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/system/config")
 public class SystemConfigController {
-    @Autowired
+    @Resource
     private MenuService menuService;
 
     /**
@@ -27,8 +28,8 @@ public class SystemConfigController {
      * @return
      */
     @GetMapping("/menu")
-    public Result getMenusByHrId() {
+    public RespBean getMenusByHrId() {
         List<Menu> menuList = menuService.getMenusByHrId();
-        return Result.success(null, menuList);
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuList);
     }
 }

@@ -32,11 +32,12 @@
 - 解决方案：
   - 第一种：在configure(WebSecurity web)方法中放行资源，/login请求不经过Spring Security过滤器链，但一般这种放行方式更多用于前端静态资源
     - `web.ignoring().antMatchers("/login");`
-  - 第二种：在动态权限的过滤器UrlFilterInvocationSecurityMetadataSource中对/login放行
+  - 第二种：在动态权限的过滤器UrlFilterInvocationSecurityMetadataSource中对/login返回null来放行
     - ```java
       if ("/login".equals(requestUrl)) {
             return null;
       }
+    - 补充：AbstractSecurityInterceptor对象的rejectPublicInvocations属性默认为false，表示返回null时，放行该请求（如果需要返回null时拒绝访问，可以在SecurityConfig的configure(HttpSecurity)方法中通过withObjectPostProcessor来设置该属性为true：`object.setRejectPublicInvocations(true);`）
   - 第三种：在configure(HttpSecurity)方法中加上重写的commence方法，对未登录的非法请求直接返回JSON，不进行重定向/login页面
     - 这种方案还能解决如下问题(前两种方案无法解决)：未登录的非法请求直接访问某个页面，被拦截到未登录后，**会让前端直接重定向到/localhost:8081/login，此时没有经过node.js请求转发，就发生跨域问题，这样前端响应拦截器拦截的响应错误中没有response，导致页面没有任何提示信息**
     - ```java
@@ -44,13 +45,13 @@
       .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
             response.setContentType("application/json;charset=utf-8");
             PrintWriter out = response.getWriter();
-            Result result = Result.error("访问失败!");
+            Result respBean = Result.error("访问失败!");
             if (authException instanceof InsufficientAuthenticationException) {
                   //未登录的非法请求
-                  result.setMsg("未登录的非法请求，请联系管理员!");
+                  respBean.setMsg("未登录的非法请求，请联系管理员!");
             }
             //写JSON字符串
-            out.write(JSON.toJSONString(result));
+            out.write(JSON.toJSONString(respBean));
             out.flush();
             out.close();
       });

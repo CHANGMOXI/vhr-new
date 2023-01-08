@@ -1,82 +1,158 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.changmoxi.vhr.mapper.PositionMapper" >
-  <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.Position" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="createDate" property="createdate" jdbcType="TIMESTAMP" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
-  </resultMap>
-  <sql id="Base_Column_List" >
-    id, name, createDate, enabled
-  </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from position
-    where id = #{id,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from position
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" parameterType="org.changmoxi.vhr.model.Position" >
-    insert into position (id, name, createDate, 
-      enabled)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{createdate,jdbcType=TIMESTAMP}, 
-      #{enabled,jdbcType=BIT})
-  </insert>
-  <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Position" >
-    insert into position
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="name != null" >
-        name,
-      </if>
-      <if test="createdate != null" >
-        createDate,
-      </if>
-      <if test="enabled != null" >
-        enabled,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="createdate != null" >
-        #{createdate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="enabled != null" >
-        #{enabled,jdbcType=BIT},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.Position" >
-    update position
-    <set >
-      <if test="name != null" >
-        name = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="createdate != null" >
-        createDate = #{createdate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="enabled != null" >
-        enabled = #{enabled,jdbcType=BIT},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.Position" >
-    update position
-    set name = #{name,jdbcType=VARCHAR},
-      createDate = #{createdate,jdbcType=TIMESTAMP},
-      enabled = #{enabled,jdbcType=BIT}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+<mapper namespace="org.changmoxi.vhr.mapper.PositionMapper">
+    <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.Position">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="createDate" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="deleted" property="deleted" jdbcType="BIT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , name, createDate, enabled, deleted
+    </sql>
+
+    <select id="getAllPositions" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from position
+        where deleted = 0
+    </select>
+
+    <select id="getCountByName" resultType="java.lang.Integer">
+        select count(*)
+        from position
+        where name = #{name}
+          and deleted = 0
+    </select>
+
+    <select id="getExistEmployeePositionIdsByIds" resultType="java.lang.Integer">
+        select p.`id`
+        from position p
+        inner join employee e on p.`id` = e.`posId`
+        <where>
+            p.`id` in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                <if test="id != null">
+                    #{id}
+                </if>
+            </foreach>
+        </where>
+        group by p.`id`
+    </select>
+
+    <select id="getNameById" resultType="java.lang.String">
+        select `name`
+        from position
+        where `id` = #{id}
+    </select>
+
+    <update id="batchUpdatePositionsByIds">
+        update position
+        <set>
+            <trim prefix="deleted = case" suffix="end,">
+                <foreach collection="ids" item="id">
+                    <if test="id != null">
+                        when id = #{id} then 1
+                    </if>
+                </foreach>
+            </trim>
+        </set>
+        <where>
+            `id` in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                <if test="id != null">
+                    #{id}
+                </if>
+            </foreach>
+        </where>
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from position
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from position
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="org.changmoxi.vhr.model.Position">
+        insert into position (id, name, createDate,
+                              enabled, deleted)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
+                #{enabled,jdbcType=BIT})
+    </insert>
+
+    <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Position">
+        insert into position
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="createDate != null">
+                createDate,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=BIT},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.Position">
+        update position
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                createDate = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.Position">
+        update position
+        set name       = #{name,jdbcType=VARCHAR},
+            createDate = #{createDate,jdbcType=TIMESTAMP},
+            enabled    = #{enabled,jdbcType=BIT},
+            deleted    = #{deleted,jdbcType=BIT}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>

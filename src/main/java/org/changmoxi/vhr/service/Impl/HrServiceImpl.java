@@ -3,11 +3,11 @@ package org.changmoxi.vhr.service.Impl;
 import org.changmoxi.vhr.mapper.HrMapper;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
@@ -16,7 +16,7 @@ import java.util.Objects;
  **/
 @Service
 public class HrServiceImpl implements HrService {
-    @Autowired
+    @Resource
     private HrMapper hrMapper;
 
     /**

@@ -21,13 +21,14 @@
     </sql>
 
     <select id="selectByUsername" resultType="org.changmoxi.vhr.model.Hr" resultMap="BaseResultMap">
-        select *
+        select
+        <include refid="Base_Column_List"/>
         from hr
         where username = #{username}
     </select>
 
     <select id="getHrRolesById" resultType="org.changmoxi.vhr.model.Role">
-        select r.*
+        select r.`id`, r.`name`, r.`nameZh`
         from role r,
              hr_role hrr
         where hrr.`rid` = r.`id`

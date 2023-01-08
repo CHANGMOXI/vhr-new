@@ -4,9 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import org.changmoxi.vhr.controller.LoginController;
 import org.changmoxi.vhr.model.Hr;
-import org.changmoxi.vhr.model.Result;
+import org.changmoxi.vhr.model.RespBean;
 import org.changmoxi.vhr.service.HrService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.*;
@@ -19,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
+import javax.annotation.Resource;
 import java.io.PrintWriter;
 
 /**
@@ -27,13 +27,13 @@ import java.io.PrintWriter;
  **/
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
+    @Resource
     private HrService hrService;
 
-    @Autowired
+    @Resource
     private UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
 
-    @Autowired
+    @Resource
     private UrlAccessDecisionManager urlAccessDecisionManager;
 
     @Bean
@@ -55,8 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          */
 //        web.ignoring().antMatchers("/login");
         /**
-         * 第二种解决方案: 在{@link UrlFilterInvocationSecurityMetadataSource}中对/login放行
-         * 第三种解决方案: 在{@link SecurityConfig#configure(HttpSecurity)}中加上重写的commence方法，对未登录的非法请求直接返回JSON，不进行重定向/login页面
+         * 第二种解决方案: 在{@link UrlFilterInvocationSecurityMetadataSource}中对/login返回null来放行
+         * 第三种解决方案: 在{@link SecurityConfig#configure(HttpSecurity)}方法中加上重写的commence方法，对未登录的非法请求直接返回JSON，不进行重定向/login页面
          */
     }
 
@@ -98,14 +98,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     PrintWriter out = response.getWriter();
                     //登录成功的Hr用户对象
                     Hr hr = (Hr) authentication.getPrincipal();
-                    Result result = Result.success("登录成功!", hr);
+                    RespBean respBean = RespBean.ok("登录成功!", hr);
                     //写JSON字符串
                     /** Hr用户对象中的 password 不能返回给前端 **/
                     //使用fastjson的SimplePropertyPreFilter过滤器，过滤指定属性
                     //如果只过滤某个层级下的指定属性，使用LevelPropertyPreFilter过滤器，根据层级过滤属性(比如xxx.xxx.password)
                     SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                     filter.getExcludes().add("password");
-                    out.write(JSON.toJSONString(result, filter));
+                    out.write(JSON.toJSONString(respBean, filter));
                     out.flush();
                     out.close();
                 })
@@ -116,20 +116,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler((request, response, exception) -> {
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
-                    Result result = Result.error("登录失败!");
+                    RespBean respBean = RespBean.error("登录失败!");
                     if (exception instanceof LockedException) {
-                        result.setMsg("账号被锁定，请联系管理员!");
+                        respBean.setMsg("账号被锁定，请联系管理员!");
                     } else if (exception instanceof CredentialsExpiredException) {
-                        result.setMsg("密码过期，请联系管理员!");
+                        respBean.setMsg("密码过期，请联系管理员!");
                     } else if (exception instanceof AccountExpiredException) {
-                        result.setMsg("账号过期，请联系管理员!");
+                        respBean.setMsg("账号过期，请联系管理员!");
                     } else if (exception instanceof DisabledException) {
-                        result.setMsg("账号被禁用，请联系管理员!");
+                        respBean.setMsg("账号被禁用，请联系管理员!");
                     } else if (exception instanceof BadCredentialsException) {
-                        result.setMsg("用户名或密码错误，请重新输入!");
+                        respBean.setMsg("用户名或密码错误，请重新输入!");
                     }
                     //写JSON字符串
-                    out.write(JSON.toJSONString(result));
+                    out.write(JSON.toJSONString(respBean));
                     out.flush();
                     out.close();
                 })
@@ -143,7 +143,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
                     //写JSON字符串
-                    out.write(JSON.toJSONString(Result.success("注销成功!")));
+                    out.write(JSON.toJSONString(RespBean.ok("注销成功!")));
                     out.flush();
                     out.close();
                 })
@@ -163,13 +163,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
-                    Result result = Result.error("访问失败!");
+                    RespBean respBean = RespBean.error("访问失败!");
                     if (authException instanceof InsufficientAuthenticationException) {
                         //未登录的非法请求
-                        result.setMsg("未登录的非法请求，请联系管理员!");
+                        respBean.setMsg("未登录的非法请求，请先登录!");
                     }
                     //写JSON字符串
-                    out.write(JSON.toJSONString(result));
+                    out.write(JSON.toJSONString(respBean));
                     out.flush();
                     out.close();
                 });
