@@ -20,11 +20,9 @@ public interface PositionMapper {
 
     List<Position> getAllPositions();
 
-    int getCountByName(String name);
+    Integer getPositionIdByName(String name);
 
     List<Integer> getExistEmployeePositionIdsByIds(Integer[] ids);
 
-    String getNameById(Integer id);
-
-    int batchUpdatePositionsByIds(@Param("ids") Integer[] ids);
+    int batchLogicDeletePositionsByIds(@Param("ids") Integer[] ids);
 }

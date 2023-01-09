@@ -47,7 +47,7 @@ public class Menu {
     }
 
     public void setUrl(String url) {
-        this.url = url == null ? null : url.trim();
+        this.url = url;
     }
 
     public String getPath() {
@@ -55,7 +55,7 @@ public class Menu {
     }
 
     public void setPath(String path) {
-        this.path = path == null ? null : path.trim();
+        this.path = path;
     }
 
     public String getComponent() {
@@ -63,7 +63,7 @@ public class Menu {
     }
 
     public void setComponent(String component) {
-        this.component = component == null ? null : component.trim();
+        this.component = component;
     }
 
     public String getName() {
@@ -71,7 +71,7 @@ public class Menu {
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+        this.name = name;
     }
 
     public String getIconCls() {
@@ -79,7 +79,7 @@ public class Menu {
     }
 
     public void setIconCls(String iconCls) {
-        this.iconCls = iconCls == null ? null : iconCls.trim();
+        this.iconCls = iconCls;
     }
 
     public Meta getMeta() {

@@ -32,14 +32,6 @@ public interface PositionService {
     RespBean updatePosition(Position position);
 
     /**
-     * 删除职位数据
-     *
-     * @param id
-     * @return
-     */
-    RespBean deletePosition(Integer id);
-
-    /**
      * 批量删除职位数据
      *
      * @param ids

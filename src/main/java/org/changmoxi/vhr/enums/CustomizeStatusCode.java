@@ -26,7 +26,12 @@ public enum CustomizeStatusCode implements StatusCode {
     EXIST_SAME_POSITION(50020, "已存在相同职位，添加失败!"),
     EXIST_EMPLOYEES_WITH_THIS_POSITION(50021, "要删除的职位存在员工，删除失败!"),
     EXIST_EMPLOYEES_WITH_ALL_POSITIONS(50022, "要删除的所有职位都存在员工，删除失败!"),
-    UPDATE_SAME_POSITION_NAME(50023, "职位名称相同，更新失败!");
+    UPDATE_SAME_POSITION(50023, "职位数据相同，更新失败!"),
+
+    EXIST_SAME_JOBLEVEL(50030, "已存在相同职称，添加失败!"),
+    EXIST_EMPLOYEES_WITH_THIS_JOBLEVEL(50031, "要删除的职称存在员工，删除失败!"),
+    EXIST_EMPLOYEES_WITH_ALL_JOBLEVELS(50032, "要删除的所有职称都存在员工，删除失败!"),
+    UPDATE_SAME_JOBLEVEL(50033, "职称数据相同，更新失败!");
 
     private Integer code;
     private String msg;

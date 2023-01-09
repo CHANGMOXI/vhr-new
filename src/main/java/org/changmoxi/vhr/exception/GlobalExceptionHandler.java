@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(CustomizeException.class)
     public RespBean customizeExceptionHandler(CustomizeException e) {
-        // log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
+        //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
         return RespBean.error(e.getCode(), e.getMsg());
     }
 }

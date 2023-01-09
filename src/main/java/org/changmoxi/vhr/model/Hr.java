@@ -101,7 +101,7 @@ public class Hr implements UserDetails {
     }
 
     public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
+        this.username = username;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class Hr implements UserDetails {
     }
 
     public void setPassword(String password) {
-        this.password = password == null ? null : password.trim();
+        this.password = password;
     }
 
     public Integer getId() {
@@ -126,7 +126,7 @@ public class Hr implements UserDetails {
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+        this.name = name;
     }
 
     public String getPhone() {
@@ -134,7 +134,7 @@ public class Hr implements UserDetails {
     }
 
     public void setPhone(String phone) {
-        this.phone = phone == null ? null : phone.trim();
+        this.phone = phone;
     }
 
     public String getTelephone() {
@@ -142,7 +142,7 @@ public class Hr implements UserDetails {
     }
 
     public void setTelephone(String telephone) {
-        this.telephone = telephone == null ? null : telephone.trim();
+        this.telephone = telephone;
     }
 
     public String getAddress() {
@@ -150,7 +150,7 @@ public class Hr implements UserDetails {
     }
 
     public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
+        this.address = address;
     }
 
     public void setEnabled(Boolean enabled) {
@@ -162,7 +162,7 @@ public class Hr implements UserDetails {
     }
 
     public void setUserface(String userface) {
-        this.userface = userface == null ? null : userface.trim();
+        this.userface = userface;
     }
 
     public String getRemark() {
@@ -170,7 +170,7 @@ public class Hr implements UserDetails {
     }
 
     public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
+        this.remark = remark;
     }
 
     public List<Role> getRoles() {

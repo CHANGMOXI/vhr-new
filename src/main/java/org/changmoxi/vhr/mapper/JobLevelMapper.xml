@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.changmoxi.vhr.mapper.PositionMapper">
-    <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.Position">
+<mapper namespace="org.changmoxi.vhr.mapper.JobLevelMapper">
+    <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.JobLevel">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="titleLevel" property="titleLevel" jdbcType="CHAR"/>
         <result column="createDate" property="createDate" jdbcType="TIMESTAMP"/>
         <result column="enabled" property="enabled" jdbcType="BIT"/>
         <result column="deleted" property="deleted" jdbcType="BIT"/>
@@ -11,40 +12,40 @@
 
     <sql id="Base_Column_List">
         id
-        , name, createDate, enabled, deleted
+        , name, titleLevel, createDate, enabled, deleted
     </sql>
 
-    <select id="getAllPositions" resultMap="BaseResultMap">
+    <select id="getAllJobLevels" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from position
+        from joblevel
         where deleted = 0
     </select>
 
-    <select id="getPositionIdByName" resultType="java.lang.Integer">
+    <select id="getJobLevelIdByName" resultType="java.lang.Integer">
         select `id`
-        from position
+        from joblevel
         where name = #{name}
           and deleted = 0
     </select>
 
-    <select id="getExistEmployeePositionIdsByIds" resultType="java.lang.Integer">
-        select p.`id`
-        from position p
-        inner join employee e on p.`id` = e.`posId`
+    <select id="getExistEmployeeJobLevelIdsByIds" resultType="java.lang.Integer">
+        select j.`id`
+        from joblevel j
+        inner join employee e on j.`id` = e.`jobLevelId`
         <where>
-            p.`id` in
+            j.`id` in
             <foreach collection="ids" item="id" separator="," open="(" close=")">
                 <if test="id != null">
                     #{id}
                 </if>
             </foreach>
         </where>
-        group by p.`id`
+        group by j.`id`
     </select>
 
-    <update id="batchLogicDeletePositionsByIds">
-        update position
+    <update id="batchLogicDeleteJobLevelsByIds">
+        update joblevel
         <set>
             <trim prefix="deleted = case" suffix="end,">
                 <foreach collection="ids" item="id">
@@ -67,31 +68,34 @@
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
-        from position
+        from joblevel
         where id = #{id,jdbcType=INTEGER}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
-        from position
+        from joblevel
         where id = #{id,jdbcType=INTEGER}
     </delete>
 
-    <insert id="insert" parameterType="org.changmoxi.vhr.model.Position">
-        insert into position (id, name, createDate,
-                              enabled, deleted)
-        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
-                #{enabled,jdbcType=BIT})
+    <insert id="insert" parameterType="org.changmoxi.vhr.model.JobLevel">
+        insert into joblevel (id, name, titleLevel,
+                              createDate, enabled, deleted)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{titleLevel,jdbcType=CHAR},
+                #{createDate,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT}), #{deleted,jdbcType=BIT})
     </insert>
 
-    <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Position">
-        insert into position
+    <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.JobLevel">
+        insert into joblevel
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 id,
             </if>
             <if test="name != null">
                 name,
+            </if>
+            <if test="titleLevel != null">
+                titleLevel,
             </if>
             <if test="createDate != null">
                 createDate,
@@ -110,6 +114,9 @@
             <if test="name != null">
                 #{name,jdbcType=VARCHAR},
             </if>
+            <if test="titleLevel != null">
+                #{titleLevel,jdbcType=CHAR},
+            </if>
             <if test="createDate != null">
                 #{createDate,jdbcType=TIMESTAMP},
             </if>
@@ -122,11 +129,14 @@
         </trim>
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.Position">
-        update position
+    <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.JobLevel">
+        update joblevel
         <set>
             <if test="name != null">
                 name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="titleLevel != null">
+                titleLevel = #{titleLevel,jdbcType=CHAR},
             </if>
             <if test="createDate != null">
                 createDate = #{createDate,jdbcType=TIMESTAMP},
@@ -135,15 +145,16 @@
                 enabled = #{enabled,jdbcType=BIT},
             </if>
             <if test="deleted != null">
-                deleted = #{deleted,jdbcType=BIT},
+                enabled = #{deleted,jdbcType=BIT},
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.Position">
-        update position
+    <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.JobLevel">
+        update joblevel
         set name       = #{name,jdbcType=VARCHAR},
+            titleLevel = #{titleLevel,jdbcType=CHAR},
             createDate = #{createDate,jdbcType=TIMESTAMP},
             enabled    = #{enabled,jdbcType=BIT},
             deleted    = #{deleted,jdbcType=BIT}

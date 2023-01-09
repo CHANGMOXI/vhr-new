@@ -27,7 +27,7 @@ public class SystemConfigController {
      *
      * @return
      */
-    @GetMapping("/menu")
+    @GetMapping("/menus")
     public RespBean getMenusByHrId() {
         List<Menu> menuList = menuService.getMenusByHrId();
         return RespBean.ok(CustomizeStatusCode.SUCCESS, menuList);
