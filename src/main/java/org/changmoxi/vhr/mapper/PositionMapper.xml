@@ -18,14 +18,14 @@
         select
         <include refid="Base_Column_List"/>
         from position
-        where deleted = 0
+        where deleted = false
     </select>
 
     <select id="getPositionIdByName" resultType="java.lang.Integer">
         select `id`
         from position
         where name = #{name}
-          and deleted = 0
+          and deleted = false
     </select>
 
     <select id="getExistEmployeePositionIdsByIds" resultType="java.lang.Integer">
@@ -81,7 +81,7 @@
         insert into position (id, name, createDate,
                               enabled, deleted)
         values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
-                #{enabled,jdbcType=BIT})
+                #{enabled,jdbcType=BIT}, #{deleted,jdbcType=BIT})
     </insert>
 
     <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Position">

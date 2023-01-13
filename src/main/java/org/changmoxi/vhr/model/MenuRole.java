@@ -7,6 +7,8 @@ public class MenuRole {
 
     private Integer rid;
 
+    private Boolean enabled;
+
     public Integer getId() {
         return id;
     }
@@ -29,5 +31,13 @@ public class MenuRole {
 
     public void setRid(Integer rid) {
         this.rid = rid;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -24,5 +24,5 @@ public interface JobLevelMapper {
 
     List<Integer> getExistEmployeeJobLevelIdsByIds(Integer[] ids);
 
-    int batchLogicDeleteJobLevelsByIds(@Param("ids") Integer[] ids);
+    int batchLogicDeleteJobLevelsByIds(Integer[] ids);
 }

@@ -19,14 +19,14 @@
         select
         <include refid="Base_Column_List"/>
         from joblevel
-        where deleted = 0
+        where deleted = false
     </select>
 
     <select id="getJobLevelIdByName" resultType="java.lang.Integer">
         select `id`
         from joblevel
         where name = #{name}
-          and deleted = 0
+          and deleted = false
     </select>
 
     <select id="getExistEmployeeJobLevelIdsByIds" resultType="java.lang.Integer">
@@ -145,7 +145,7 @@
                 enabled = #{enabled,jdbcType=BIT},
             </if>
             <if test="deleted != null">
-                enabled = #{deleted,jdbcType=BIT},
+                deleted = #{deleted,jdbcType=BIT},
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}

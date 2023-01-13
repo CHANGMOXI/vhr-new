@@ -24,5 +24,5 @@ public interface PositionMapper {
 
     List<Integer> getExistEmployeePositionIdsByIds(Integer[] ids);
 
-    int batchLogicDeletePositionsByIds(@Param("ids") Integer[] ids);
+    int batchLogicDeletePositionsByIds(Integer[] ids);
 }

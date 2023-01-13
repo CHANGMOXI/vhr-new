@@ -10,12 +10,14 @@
 
 总结：<u>前端所有的操作都是为了提高用户体验</u>，不能通过前端控制菜单等数据的显示或隐藏来实现权限管理，<u>这只是因为后端决定的权限导致部分菜单等数据无法访问，所以为了提供用户体验需要将用户不能访问的接口或者菜单隐藏起来</u>。比如前端请求后端菜单项数据之后动态加载菜单项，只是为了提高用户体验、前端做数据校验是为了提高效率，提高用户体验，后端需要真正的确保数据完整性。
 
+
 ### 加载用户菜单项数据流程
 涉及的表：`hr`、`hr_role`、`role`、`menu`、`menu_role`
 - 查询流程（多表内连接）
   - hr_role表.`hrid` = 用户id **查询hr_role表.`rid`**（**角色id**）
     - menu_role表.`rid` = 角色id **查询menu_role表.`mid`**（**菜单id**）
       - **其他筛选条件**：menu表自连接 m1.`id` = m2.`parentId`、m2.`enabled` = true
+
 
 ### 判断HTTP请求是否具有权限访问
 前提：在menu、menu_role表中只给二级菜单分配角色，只要能访问某个二级菜单，其一级菜单在查询结果中自然会被查询到
@@ -24,6 +26,7 @@
     - 分析请求url地址和menu表中哪个url匹配，进而查询相应的需要请求的二级菜单
       - 根据需要请求的二级菜单的id(menu表.`id`)，在menu_role表中查询访问该二级菜单需要的角色(menu_role表.`rid`)
         - 根据当前登录用户id在hr_role表中查询是否具有相应的角色(hr_role表.`rid`)，决定是否能访问该二级菜单接口
+
 
 ### 未登录情况下访问需要登录的请求 存在的问题
 在自定义过滤器进行动态权限之后，未登录的非法请求会抛异常并重定向到登录页面/login
@@ -56,3 +59,37 @@
             out.close();
       });
     - 这样配置就可以不进行重定向请求登录页面直接返回JSON提示，**避免 <u>/login请求死循环</u> 和 <u>不经过node.js请求转发而由前端直接重定向引起的跨域问题导致没有任何提示信息</u> 这些问题**
+
+
+### 存在 服务端重启或页面长时间无操作之后，页面直接显示commence方法设置的非法请求提示而不是跳转登录页面 的问题
+- 原因：服务端重启或页面长时间无操作之后，前端的session失效，没有登录信息，导致请求走到commence方法而直接提示非法请求
+- 解决方法：在commence方法中返回JSON之前，设置http状态码为401（需要认证），前端响应拦截器拦截401响应错误之后跳转登录页面
+```java
+.csrf().disable()
+.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+      response.setContentType("application/json;charset=utf-8");
+      
+      // 前端响应拦截器拦截401响应错误并跳转到登录页面
+      response.setStatus(401);
+      
+      //参照上面的commence方法......
+      });
+```
+```javascript
+axios.interceptors.response.use(success => {
+  // 对响应数据的处理，也就是http状态码在2xx范围
+  // ......
+}, error => {
+  // 对响应错误的处理，也就是http状态码超过2xx范围
+  // ......
+  else if (error.response.status == 401) {
+    Message.error({message: '尚未登录，请登录!'})
+    // 服务端重启或页面长时间无操作之后可能会返回401响应错误，跳转到登录页面
+    router.replace('/');
+  }
+  // ......
+  
+  // 返回空，没有数据，代表请求失败，方便后续判断
+  return;
+})
+```

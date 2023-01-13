@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.exception;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.RespBean;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,5 +42,19 @@ public class GlobalExceptionHandler {
     public RespBean customizeExceptionHandler(CustomizeException e) {
         //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
         return RespBean.error(e.getCode(), e.getMsg());
+    }
+
+    /**
+     * 处理MyBatis异常，包括事务异常等
+     * IbatisException是MyBatis异常的顶级父类，但已过时
+     * 代替它的是它的子类PersistenceException
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(PersistenceException.class)
+    public RespBean runtimeExceptionHandler(PersistenceException e) {
+        //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
+        return RespBean.error(CustomizeStatusCode.DATABASE_EXCEPTION);
     }
 }

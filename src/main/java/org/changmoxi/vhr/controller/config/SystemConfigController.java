@@ -1,7 +1,5 @@
 package org.changmoxi.vhr.controller.config;
 
-import org.changmoxi.vhr.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.model.Menu;
 import org.changmoxi.vhr.model.RespBean;
 import org.changmoxi.vhr.service.MenuService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author CZS
@@ -29,7 +26,6 @@ public class SystemConfigController {
      */
     @GetMapping("/menus")
     public RespBean getMenusByHrId() {
-        List<Menu> menuList = menuService.getMenusByHrId();
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuList);
+        return menuService.getMenusByHrId();
     }
 }

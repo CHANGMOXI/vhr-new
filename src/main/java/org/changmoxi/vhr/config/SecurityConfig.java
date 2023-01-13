@@ -84,6 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 /**
                  * 指定登录页面，在前后端分离下后端不进行页面跳转(重定向)
                  * 在未登录去访问/login时，实际上没有返回登录页面，而是通过{@link LoginController#login()}给前端返回JSON提示信息
+                 *
+                 * 注意：重写commence方法不进行重定向之后，就不需要在这里指定登录页面
                  */
                 .loginPage("/login")
                 /** 登录成功的回调 **/
@@ -162,6 +164,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //在这里的exceptionHandling().authenticationEntryPoint方法中传入AuthenticationEntryPoint对象，重写该对象的commence方法
                 .exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
                     response.setContentType("application/json;charset=utf-8");
+
+                    /** 处理服务端重启或页面长时间无操作之后，页面直接提示下面的非法请求而不是跳转登录页面的问题 **/
+                    // 前端响应拦截器拦截401响应错误并跳转到登录页面
+                    response.setStatus(401);
+
                     PrintWriter out = response.getWriter();
                     RespBean respBean = RespBean.error("访问失败!");
                     if (authException instanceof InsufficientAuthenticationException) {

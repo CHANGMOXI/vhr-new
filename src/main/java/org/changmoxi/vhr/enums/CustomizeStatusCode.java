@@ -20,7 +20,7 @@ public enum CustomizeStatusCode implements StatusCode {
 
     PARAMETER_ERROR(5000, "传参有误或缺少必要参数!"),
 
-    DATABASE_EXCEPTION(50000, "数据库异常，操作失败!"),
+    DATABASE_EXCEPTION(50000, "数据异常，请稍后再试!"),
     DATABASE_VIOLATE_INTEGRITY_CONSTRAINT(50001, "该数据有关联数据，操作失败!"),
 
     EXIST_SAME_POSITION(50020, "已存在相同职位，添加失败!"),
@@ -31,7 +31,10 @@ public enum CustomizeStatusCode implements StatusCode {
     EXIST_SAME_JOBLEVEL(50030, "已存在相同职称，添加失败!"),
     EXIST_EMPLOYEES_WITH_THIS_JOBLEVEL(50031, "要删除的职称存在员工，删除失败!"),
     EXIST_EMPLOYEES_WITH_ALL_JOBLEVELS(50032, "要删除的所有职称都存在员工，删除失败!"),
-    UPDATE_SAME_JOBLEVEL(50033, "职称数据相同，更新失败!");
+    UPDATE_SAME_JOBLEVEL(50033, "职称数据相同，更新失败!"),
+
+    EXIST_SAME_ROLE(50050, "已存在相同角色，添加失败!"),
+    ;
 
     private Integer code;
     private String msg;

@@ -30,7 +30,7 @@ public class CustomizeException extends RuntimeException {
     }
 
     /**
-     * 默认使用ERROR(500)状态码
+     * 默认使用ERROR(500)状态码，自定义提示信息
      *
      * @param message
      */
@@ -39,6 +39,6 @@ public class CustomizeException extends RuntimeException {
         super(message);
         //默认使用ERROR(500)状态码
         this.code = CustomizeStatusCode.ERROR.getCode();
-        this.msg = CustomizeStatusCode.ERROR.getMsg();
+        this.msg = message;
     }
 }

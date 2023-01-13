@@ -7,6 +7,8 @@ public class Role {
 
     private String nameZh;
 
+    private Boolean deleted;
+
     public Integer getId() {
         return id;
     }
@@ -20,7 +22,7 @@ public class Role {
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+        this.name = name;
     }
 
     public String getNameZh() {
@@ -28,6 +30,14 @@ public class Role {
     }
 
     public void setNameZh(String nameZh) {
-        this.nameZh = nameZh == null ? null : nameZh.trim();
+        this.nameZh = nameZh;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }
