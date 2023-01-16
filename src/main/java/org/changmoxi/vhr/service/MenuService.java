@@ -34,17 +34,17 @@ public interface MenuService {
     /**
      * 获取角色可操作的菜单项id
      *
-     * @param rid
+     * @param rId
      * @return
      */
-    RespBean getEnabledMidsByRid(Integer rid);
+    RespBean getEnabledMIdsByRId(Integer rId);
 
     /**
      * 更新角色可操作的菜单项id
      *
-     * @param rid
-     * @param mids
+     * @param rId
+     * @param mIds
      * @return
      */
-    RespBean batchEnableMenuRoles(Integer rid, Integer[] mids);
+    RespBean batchEnableMenuRoles(Integer rId, Integer[] mIds);
 }

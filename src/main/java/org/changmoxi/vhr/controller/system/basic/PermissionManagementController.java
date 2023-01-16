@@ -44,24 +44,24 @@ public class PermissionManagementController {
     /**
      * 获取角色可操作的菜单项id
      *
-     * @param rid
+     * @param rId
      * @return
      */
     @GetMapping("/mids/{rid}")
-    public RespBean getEnabledMidsByRid(@PathVariable("rid") Integer rid) {
-        return menuService.getEnabledMidsByRid(rid);
+    public RespBean getEnabledMIdsByRId(@PathVariable("rid") Integer rId) {
+        return menuService.getEnabledMIdsByRId(rId);
     }
 
     /**
      * 更新角色可操作的菜单项id
      *
-     * @param rid
-     * @param mids
+     * @param rId
+     * @param mIds
      * @return
      */
     @PutMapping("/")
-    public RespBean batchEnableMenuRoles(Integer rid, Integer[] mids) {
-        return menuService.batchEnableMenuRoles(rid, mids);
+    public RespBean batchEnableMenuRoles(Integer rId, Integer[] mIds) {
+        return menuService.batchEnableMenuRoles(rId, mIds);
     }
 
     /**
@@ -78,11 +78,11 @@ public class PermissionManagementController {
     /**
      * 删除角色
      *
-     * @param rid
+     * @param rId
      * @return
      */
-    @DeleteMapping("/role/{rid}")
-    public RespBean deleteRole(@PathVariable Integer rid) {
-        return roleService.deleteRole(rid);
+    @DeleteMapping("/role/{rId}")
+    public RespBean deleteRole(@PathVariable Integer rId) {
+        return roleService.deleteRole(rId);
     }
 }

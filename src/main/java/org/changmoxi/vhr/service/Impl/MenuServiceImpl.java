@@ -51,60 +51,60 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public RespBean getEnabledMidsByRid(Integer rid) {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuRoleMapper.getEnabledMidsByRid(rid));
+    public RespBean getEnabledMIdsByRId(Integer rId) {
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuRoleMapper.getEnabledMidsByRid(rId));
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public RespBean batchEnableMenuRoles(Integer rid, Integer[] mids) {
-        if (Objects.isNull(rid)) {
+    public RespBean batchEnableMenuRoles(Integer rId, Integer[] mIds) {
+        if (Objects.isNull(rId)) {
             throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "rid不能为空");
         }
 
-        List<Integer> allMids = menuRoleMapper.getAllMidsByRid(rid);
-        if (ArrayUtils.isEmpty(mids)) {
-            if (CollectionUtils.isEmpty(allMids)) {
-                /** 全部禁用并且rid角色在menu_role表中没有记录 **/
+        List<Integer> allMIds = menuRoleMapper.getAllMidsByRid(rId);
+        if (ArrayUtils.isEmpty(mIds)) {
+            if (CollectionUtils.isEmpty(allMIds)) {
+                /** 全部禁用并且rId角色在menu_role表中没有记录 **/
                 return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE);
             } else {
-                /** 全部禁用并且rid角色在menu_role表中存在记录 **/
-                return menuRoleMapper.batchEnableOrDisableMenuRoles(rid, allMids.toArray(new Integer[0]), false) > 0 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+                /** 全部禁用并且rId角色在menu_role表中存在记录 **/
+                return menuRoleMapper.batchEnableOrDisableMenuRoles(rId, allMIds.toArray(new Integer[0]), false) > 0 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
             }
         }
-        if (CollectionUtils.isEmpty(allMids)) {
-            /** rid角色在menu_role表中没有记录，全部新增 **/
-            return menuRoleMapper.insertMenuRoles(rid, mids) == mids.length ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+        if (CollectionUtils.isEmpty(allMIds)) {
+            /** rId角色在menu_role表中没有记录，全部新增 **/
+            return menuRoleMapper.insertMenuRoles(rId, mIds) == mIds.length ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
         } else {
-            Integer[] insertMids = Arrays.stream(mids).filter(mid -> !allMids.contains(mid)).toArray(Integer[]::new);
-            if (!ArrayUtils.isEmpty(insertMids)) {
-                if (insertMids.length < mids.length) {
+            Integer[] insertMIds = Arrays.stream(mIds).filter(mid -> !allMIds.contains(mid)).toArray(Integer[]::new);
+            if (!ArrayUtils.isEmpty(insertMIds)) {
+                if (insertMIds.length < mIds.length) {
                     /** 部分修改部分新增 **/
                     //部分修改
-                    Integer[] updateMids = Arrays.stream(mids).filter(allMids::contains).toArray(Integer[]::new);
-                    int updateCount = menuRoleMapper.batchEnableOrDisableMenuRoles(rid, updateMids, true);
+                    Integer[] updateMIds = Arrays.stream(mIds).filter(allMIds::contains).toArray(Integer[]::new);
+                    int updateCount = menuRoleMapper.batchEnableOrDisableMenuRoles(rId, updateMIds, true);
                     //部分新增
-                    int insertCount = menuRoleMapper.insertMenuRoles(rid, insertMids);
-                    if (updateCount == 0 || insertCount != insertMids.length) {
+                    int insertCount = menuRoleMapper.insertMenuRoles(rId, insertMIds);
+                    if (updateCount == 0 || insertCount != insertMIds.length) {
                         //数据操作异常，手动抛异常回滚
-                        throw new PersistenceException("menu_role表修改或新增部分记录操作异常，rid【" + rid + "】");
+                        throw new PersistenceException("menu_role表修改或新增部分记录操作异常，rId【" + rId + "】");
                     }
                     return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE);
                 } else {
                     /** 全部新增 **/
                     //已有记录修改成禁用
-                    int updateCount = menuRoleMapper.batchEnableOrDisableMenuRoles(rid, allMids.toArray(new Integer[0]), false);
+                    int updateCount = menuRoleMapper.batchEnableOrDisableMenuRoles(rId, allMIds.toArray(new Integer[0]), false);
                     //新增
-                    int insertCount = menuRoleMapper.insertMenuRoles(rid, mids);
-                    if (updateCount == 0 || insertCount != mids.length) {
+                    int insertCount = menuRoleMapper.insertMenuRoles(rId, mIds);
+                    if (updateCount == 0 || insertCount != mIds.length) {
                         //数据操作异常，手动抛异常回滚
-                        throw new PersistenceException("menu_role表修改已有记录为禁用或新增记录操作异常，rid【" + rid + "】");
+                        throw new PersistenceException("menu_role表修改已有记录为禁用或新增记录操作异常，rId【" + rId + "】");
                     }
                     return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE);
                 }
             }
         }
-        /** mids在menu_role表中都存在记录，全部修改 **/
-        return menuRoleMapper.batchEnableOrDisableMenuRoles(rid, mids, true) > 0 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+        /** mIds在menu_role表中都存在记录，全部修改 **/
+        return menuRoleMapper.batchEnableOrDisableMenuRoles(rId, mIds, true) > 0 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
     }
 }

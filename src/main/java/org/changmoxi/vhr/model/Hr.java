@@ -1,5 +1,7 @@
 package org.changmoxi.vhr.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +13,8 @@ import java.util.List;
 /**
  * Hr用户类
  */
+@ToString
+@EqualsAndHashCode
 public class Hr implements UserDetails {
     private Integer id;
 

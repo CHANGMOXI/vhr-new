@@ -3,8 +3,8 @@
 <mapper namespace="org.changmoxi.vhr.mapper.MenuRoleMapper">
     <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.MenuRole">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="mid" property="mid" jdbcType="INTEGER"/>
-        <result column="rid" property="rid" jdbcType="INTEGER"/>
+        <result column="mid" property="mId" jdbcType="INTEGER"/>
+        <result column="rid" property="rId" jdbcType="INTEGER"/>
         <result column="enabled" property="enabled" jdbcType="BIT"/>
     </resultMap>
 
@@ -16,26 +16,26 @@
     <select id="getEnabledMidsByRid" resultType="java.lang.Integer">
         select mid
         from menu_role
-        where rid = #{rid}
+        where rid = #{rId}
           and enabled = true
     </select>
 
     <select id="getAllMidsByRid" resultType="java.lang.Integer">
         select mid
         from menu_role
-        where rid = #{rid}
+        where rid = #{rId}
     </select>
 
     <update id="batchEnableOrDisableMenuRoles">
         update menu_role
         <set>
             <trim prefix="enabled = case">
-                <foreach collection="mids" item="mid">
-                    <if test="mid != null and enable">
-                        when mid = #{mid} then 1
+                <foreach collection="mids" item="mId">
+                    <if test="mId != null and enable">
+                        when mid = #{mId} then 1
                     </if>
-                    <if test="mid != null and !enable">
-                        when mid = #{mid} then 0
+                    <if test="mId != null and !enable">
+                        when mid = #{mId} then 0
                     </if>
                 </foreach>
                 <if test="enable">
@@ -47,16 +47,16 @@
             </trim>
         </set>
         <where>
-            <if test="rid != null">
-                rid = #{rid}
+            <if test="rId != null">
+                rid = #{rId}
             </if>
         </where>
     </update>
 
     <insert id="insertMenuRoles">
         insert into menu_role (mid, rid) values
-        <foreach collection="mids" item="mid" separator=",">
-            (#{mid}, #{rid})
+        <foreach collection="mids" item="mId" separator=",">
+            (#{mId}, #{rId})
         </foreach>
     </insert>
 
@@ -75,7 +75,7 @@
 
     <insert id="insert" parameterType="org.changmoxi.vhr.model.MenuRole">
         insert into menu_role (id, mid, rid, enabled)
-        values (#{id,jdbcType=INTEGER}, #{mid,jdbcType=INTEGER}, #{rid,jdbcType=INTEGER}, #{enabled,jdbcType=BIT})
+        values (#{id,jdbcType=INTEGER}, #{mId,jdbcType=INTEGER}, #{rId,jdbcType=INTEGER}, #{enabled,jdbcType=BIT})
     </insert>
 
     <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.MenuRole">
@@ -84,10 +84,10 @@
             <if test="id != null">
                 id,
             </if>
-            <if test="mid != null">
+            <if test="mId != null">
                 mid,
             </if>
-            <if test="rid != null">
+            <if test="rId != null">
                 rid,
             </if>
             <if test="enabled != null">
@@ -98,11 +98,11 @@
             <if test="id != null">
                 #{id,jdbcType=INTEGER},
             </if>
-            <if test="mid != null">
-                #{mid,jdbcType=INTEGER},
+            <if test="mId != null">
+                #{mId,jdbcType=INTEGER},
             </if>
-            <if test="rid != null">
-                #{rid,jdbcType=INTEGER},
+            <if test="rId != null">
+                #{rId,jdbcType=INTEGER},
             </if>
             <if test="enabled != null">
                 #{enabled,jdbcType=BIT},
@@ -113,11 +113,11 @@
     <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.MenuRole">
         update menu_role
         <set>
-            <if test="mid != null">
-                mid = #{mid,jdbcType=INTEGER},
+            <if test="mId != null">
+                mid = #{mId,jdbcType=INTEGER},
             </if>
-            <if test="rid != null">
-                rid = #{rid,jdbcType=INTEGER},
+            <if test="rId != null">
+                rid = #{rId,jdbcType=INTEGER},
             </if>
             <if test="enabled != null">
                 #{enabled,jdbcType=BIT},
@@ -128,8 +128,8 @@
 
     <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.MenuRole">
         update menu_role
-        set mid     = #{mid,jdbcType=INTEGER},
-            rid     = #{rid,jdbcType=INTEGER},
+        set mid     = #{mId,jdbcType=INTEGER},
+            rid     = #{rId,jdbcType=INTEGER},
             enabled = #{enabled,jdbcType=BIT}
         where id = #{id,jdbcType=INTEGER}
     </update>
