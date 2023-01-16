@@ -93,3 +93,12 @@ axios.interceptors.response.use(success => {
   return;
 })
 ```
+
+
+
+### MySQL表主键id重新自增排序
+```sql
+SET @i=0;
+UPDATE `employee` SET `id` = (@i:=@i+1);
+ALTER TABLE `employee` AUTO_INCREMENT = 0;
+```

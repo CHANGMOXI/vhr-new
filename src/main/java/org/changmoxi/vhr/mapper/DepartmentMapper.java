@@ -2,6 +2,8 @@ package org.changmoxi.vhr.mapper;
 
 import org.changmoxi.vhr.model.Department;
 
+import java.util.List;
+
 public interface DepartmentMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,12 @@ public interface DepartmentMapper {
     int updateByPrimaryKeySelective(Department record);
 
     int updateByPrimaryKey(Department record);
+
+    List<Department> getAllDepartmentsByParentId(Integer parentId);
+
+    List<Integer> getParentIdsByName(String name);
+
+    int addDepartmentAndReturnLastInsertId(Department department);
+
+    int getEmployeeCountOfDepartment(Integer id);
 }

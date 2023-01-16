@@ -53,8 +53,20 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(PersistenceException.class)
-    public RespBean runtimeExceptionHandler(PersistenceException e) {
+    public RespBean persistenceExceptionHandler(PersistenceException e) {
         //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
         return RespBean.error(CustomizeStatusCode.DATABASE_EXCEPTION);
+    }
+
+    /**
+     * 处理其他异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(Exception.class)
+    public RespBean exceptionHandler(Exception e) {
+        //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
+        return RespBean.error(CustomizeStatusCode.ERROR_UNKNOWN);
     }
 }

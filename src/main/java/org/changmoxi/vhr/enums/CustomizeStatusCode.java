@@ -18,10 +18,16 @@ public enum CustomizeStatusCode implements StatusCode {
     ERROR_DELETE(500, "删除失败!"),
     ERROR_UPDATE(500, "更新失败!"),
 
+    ERROR_UNKNOWN(500, "服务器冒烟了，请稍后再试!"),
+
     PARAMETER_ERROR(5000, "传参有误或缺少必要参数!"),
 
     DATABASE_EXCEPTION(50000, "数据异常，请稍后再试!"),
     DATABASE_VIOLATE_INTEGRITY_CONSTRAINT(50001, "该数据有关联数据，操作失败!"),
+
+    EXIST_SAME_DEPARTMENT(50010, "已存在相同部门，添加失败!"),
+    EXIST_SUB_DEPARTMENTS(50011, "存在子部门，删除失败!"),
+    EXIST_EMPLOYEES(50012, "存在员工，删除失败!"),
 
     EXIST_SAME_POSITION(50020, "已存在相同职位，添加失败!"),
     EXIST_EMPLOYEES_WITH_THIS_POSITION(50021, "要删除的职位存在员工，删除失败!"),
