@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,9 +33,11 @@ public class Hr implements UserDetails {
 
     private String password;
 
-    private String userface;
+    private String userFace;
 
     private String remark;
+
+    private Boolean deleted;
 
     /**
      * 用户所具备的角色
@@ -87,10 +90,13 @@ public class Hr implements UserDetails {
 
     /**
      * 返回用户所具备的角色
+     * JsonIgnore注解: 向前端返回Hr数据时忽略authorities权限集合
+     * 因为前端传Hr对象到后端时，如果不自定义反序列化的类，authorities权限集合反序列化会失败
      *
      * @return
      */
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>(roles.size());
         for (Role role : roles) {
@@ -161,12 +167,12 @@ public class Hr implements UserDetails {
         this.enabled = enabled;
     }
 
-    public String getUserface() {
-        return userface;
+    public String getUserFace() {
+        return userFace;
     }
 
-    public void setUserface(String userface) {
-        this.userface = userface;
+    public void setUserFace(String userFace) {
+        this.userFace = userFace;
     }
 
     public String getRemark() {
@@ -183,5 +189,13 @@ public class Hr implements UserDetails {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

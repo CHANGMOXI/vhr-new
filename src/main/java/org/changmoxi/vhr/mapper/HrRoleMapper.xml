@@ -5,12 +5,53 @@
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="hrid" property="hrId" jdbcType="INTEGER"/>
         <result column="rid" property="rId" jdbcType="INTEGER"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id
-        , hrid, rid
+        , hrid, rid, enabled
     </sql>
+
+    <select id="getAllRIdsByHrId" resultType="java.lang.Integer">
+        select rid
+        from hr_role
+        where hrid = #{hrId}
+    </select>
+
+    <update id="batchEnableOrDisableHrRoles">
+        update hr_role
+        <set>
+            <trim prefix="enabled = case">
+                <foreach collection="rIds" item="rId">
+                    <if test="rId != null and enable">
+                        when rid = #{rId} then 1
+                    </if>
+                    <if test="rId != null and !enable">
+                        when rid = #{rId} then 0
+                    </if>
+                </foreach>
+                <if test="enable">
+                    else 0 end
+                </if>
+                <if test="!enable">
+                    else 1 end
+                </if>
+            </trim>
+        </set>
+        <where>
+            <if test="hrId != null">
+                hrid = #{hrId}
+            </if>
+        </where>
+    </update>
+
+    <insert id="insertHrRoles">
+        insert into hr_role (hrid, rid) values
+        <foreach collection="rIds" item="rId" separator=",">
+            (#{hrId}, #{rId})
+        </foreach>
+    </insert>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select

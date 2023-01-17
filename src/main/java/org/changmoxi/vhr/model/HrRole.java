@@ -9,4 +9,6 @@ public class HrRole {
     private Integer hrId;
 
     private Integer rId;
+
+    private Boolean enabled;
 }

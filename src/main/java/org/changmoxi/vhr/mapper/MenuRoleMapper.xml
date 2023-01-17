@@ -20,7 +20,7 @@
           and enabled = true
     </select>
 
-    <select id="getAllMidsByRid" resultType="java.lang.Integer">
+    <select id="getAllMIdsByRId" resultType="java.lang.Integer">
         select mid
         from menu_role
         where rid = #{rId}
@@ -30,7 +30,7 @@
         update menu_role
         <set>
             <trim prefix="enabled = case">
-                <foreach collection="mids" item="mId">
+                <foreach collection="mIds" item="mId">
                     <if test="mId != null and enable">
                         when mid = #{mId} then 1
                     </if>
@@ -55,7 +55,7 @@
 
     <insert id="insertMenuRoles">
         insert into menu_role (mid, rid) values
-        <foreach collection="mids" item="mId" separator=",">
+        <foreach collection="mIds" item="mId" separator=",">
             (#{mId}, #{rId})
         </foreach>
     </insert>

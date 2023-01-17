@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.model.Role;
 
@@ -21,4 +22,8 @@ public interface HrMapper {
     Hr selectByUsername(String username);
 
     List<Role> getHrRolesById(Integer id);
+
+    List<Hr> getAllOtherHrs(@Param("id") Integer id, @Param("keywords") String keywords);
+
+    int logicDelete(Integer id);
 }

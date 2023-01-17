@@ -13,10 +13,11 @@
 
 ### 加载用户菜单项数据流程
 涉及的表：`hr`、`hr_role`、`role`、`menu`、`menu_role`
-- 查询流程（多表内连接）
-  - hr_role表.`hrid` = 用户id **查询hr_role表.`rid`**（**角色id**）
-    - menu_role表.`rid` = 角色id **查询menu_role表.`mid`**（**菜单id**）
-      - **其他筛选条件**：menu表自连接 m1.`id` = m2.`parentId`、m2.`enabled` = true
+- 查询流程（多表联查）
+  - menu m1 inner join menu m2 on m1.`id` = m2.`parentId`（一级菜单二级菜单）
+    - inner join menu_role mr on mr.`mid` = m2.`id`（可操作的二级菜单）
+      - inner join hr_role hrr on hrr.`rid` = mr.`rid`（用户的角色 对应 menu_role表的rid）
+        - 筛选条件: m2.`enabled` = true and mr.`enabled` = true and hrr.`hrid` = 用户id
 
 
 ### 判断HTTP请求是否具有权限访问

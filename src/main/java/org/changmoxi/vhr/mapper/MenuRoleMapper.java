@@ -20,9 +20,9 @@ public interface MenuRoleMapper {
 
     List<Integer> getEnabledMidsByRid(Integer rid);
 
-    List<Integer> getAllMidsByRid(Integer rid);
+    List<Integer> getAllMIdsByRId(Integer rId);
 
-    int batchEnableOrDisableMenuRoles(@Param("rid") Integer rid, @Param("mids") Integer[] mids, @Param("enable") Boolean enable);
+    int batchEnableOrDisableMenuRoles(@Param("rId") Integer rId, @Param("mIds") Integer[] mIds, @Param("enable") Boolean enable);
 
-    int insertMenuRoles(@Param("rid") Integer rid, @Param("mids") Integer[] mids);
+    int insertMenuRoles(@Param("rId") Integer rId, @Param("mIds") Integer[] mIds);
 }

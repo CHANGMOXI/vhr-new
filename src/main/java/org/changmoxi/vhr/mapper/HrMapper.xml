@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.changmoxi.vhr.mapper.HrMapper">
-
     <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.Hr">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
@@ -11,29 +10,79 @@
         <result column="enabled" property="enabled" jdbcType="BIT"/>
         <result column="username" property="username" jdbcType="VARCHAR"/>
         <result column="password" property="password" jdbcType="VARCHAR"/>
-        <result column="userface" property="userface" jdbcType="VARCHAR"/>
+        <result column="userface" property="userFace" jdbcType="VARCHAR"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="deleted" property="deleted" jdbcType="BIT"/>
+    </resultMap>
+
+    <resultMap id="HrsWithRoles" type="org.changmoxi.vhr.model.Hr" extends="BaseResultMap">
+        <!--复杂属性的映射需要另外处理，集合(一对多)用collection-->
+        <collection property="roles" ofType="org.changmoxi.vhr.model.Role">
+            <id column="rid" property="id" jdbcType="INTEGER"/>
+            <result column="rname" property="name" jdbcType="VARCHAR"/>
+            <result column="rnameZh" property="nameZh" jdbcType="VARCHAR"/>
+            <result column="rdeleted" property="deleted" jdbcType="BIT"/>
+        </collection>
     </resultMap>
 
     <sql id="Base_Column_List">
         id
-        , name, phone, telephone, address, enabled, username, password, userface, remark
+        , name, phone, telephone, address, enabled, username, password, userface, remark, deleted
     </sql>
 
     <select id="selectByUsername" resultType="org.changmoxi.vhr.model.Hr" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from hr
-        where username = #{username}
+        where username = #{username} and deleted = false
     </select>
 
     <select id="getHrRolesById" resultType="org.changmoxi.vhr.model.Role">
         select r.`id`, r.`name`, r.`nameZh`
-        from role r,
-             hr_role hrr
-        where hrr.`rid` = r.`id`
-          and hrr.`hrid` = #{id}
+        from `role` r
+                 inner join hr_role hrr on hrr.`rid` = r.`id`
+        where hrr.`hrid` = #{id}
+          and hrr.`enabled` = true
+          and r.`deleted` = false
     </select>
+
+    <select id="getAllOtherHrs" resultMap="HrsWithRoles">
+        select hr.`id`,
+        hr.`name`,
+        hr.`phone`,
+        hr.`telephone`,
+        hr.`address`,
+        hr.`enabled`,
+        hr.`username`,
+        hr.`userface`,
+        hr.`remark`,
+        hr.`deleted`,
+        r.`id` rid,
+        r.`name` rname,
+        r.`nameZh` rnameZh,
+        r.`deleted` rdeleted
+        from hr
+        left join hr_role hrr on hr.`id` = hrr.`hrid` and hrr.`enabled` = true
+        left join role r on hrr.`rid` = r.`id` and r.`deleted` = false
+        <where>
+            <if test="id != null">
+                and hr.`id` &lt;&gt; #{id}
+            </if>
+            <if test="keywords != null and keywords != ''">
+                and hr.`name` like CONCAT('%',#{keywords},'%')
+            </if>
+            and hr.`deleted` = false
+            and ((hrr.`enabled` = true and r.`deleted` = false) or (hrr.`enabled` is null and r.`deleted` is null))
+        </where>
+        order by hr.`id`, r.`id`
+    </select>
+
+    <update id="logicDelete">
+        update hr
+        set deleted = true
+        where id = #{id}
+    </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -52,11 +101,11 @@
         insert into hr (id, name, phone,
                         telephone, address, enabled,
                         username, password, userface,
-                        remark)
+                        remark, deleted)
         values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=CHAR},
                 #{telephone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT},
-                #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{userface,jdbcType=VARCHAR},
-                #{remark,jdbcType=VARCHAR})
+                #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{userFace,jdbcType=VARCHAR},
+                #{remark,jdbcType=VARCHAR}, #{deleted,jdbcType=BIT})
     </insert>
 
     <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Hr">
@@ -86,11 +135,14 @@
             <if test="password != null">
                 password,
             </if>
-            <if test="userface != null">
+            <if test="userFace != null">
                 userface,
             </if>
             <if test="remark != null">
                 remark,
+            </if>
+            <if test="deleted != null">
+                deleted,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -118,11 +170,14 @@
             <if test="password != null">
                 #{password,jdbcType=VARCHAR},
             </if>
-            <if test="userface != null">
-                #{userface,jdbcType=VARCHAR},
+            <if test="userFace != null">
+                #{userFace,jdbcType=VARCHAR},
             </if>
             <if test="remark != null">
                 #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BIT},
             </if>
         </trim>
     </insert>
@@ -151,11 +206,14 @@
             <if test="password != null">
                 password = #{password,jdbcType=VARCHAR},
             </if>
-            <if test="userface != null">
-                userface = #{userface,jdbcType=VARCHAR},
+            <if test="userFace != null">
+                userface = #{userFace,jdbcType=VARCHAR},
             </if>
             <if test="remark != null">
                 remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BIT},
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}
@@ -170,8 +228,9 @@
             enabled   = #{enabled,jdbcType=BIT},
             username  = #{username,jdbcType=VARCHAR},
             password  = #{password,jdbcType=VARCHAR},
-            userface  = #{userface,jdbcType=VARCHAR},
-            remark    = #{remark,jdbcType=VARCHAR}
+            userface  = #{userFace,jdbcType=VARCHAR},
+            remark    = #{remark,jdbcType=VARCHAR},
+            deleted   = #{deleted,jdbcType=BIT}
         where id = #{id,jdbcType=INTEGER}
     </update>
 </mapper>

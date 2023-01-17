@@ -59,10 +59,10 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = RuntimeException.class)
     public RespBean batchEnableMenuRoles(Integer rId, Integer[] mIds) {
         if (Objects.isNull(rId)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "rid不能为空");
+            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "rId不能为空");
         }
 
-        List<Integer> allMIds = menuRoleMapper.getAllMidsByRid(rId);
+        List<Integer> allMIds = menuRoleMapper.getAllMIdsByRId(rId);
         if (ArrayUtils.isEmpty(mIds)) {
             if (CollectionUtils.isEmpty(allMIds)) {
                 /** 全部禁用并且rId角色在menu_role表中没有记录 **/
