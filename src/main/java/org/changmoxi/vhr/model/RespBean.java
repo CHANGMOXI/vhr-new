@@ -1,10 +1,14 @@
 package org.changmoxi.vhr.model;
 
+import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.changmoxi.vhr.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.exception.StatusCode;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author CZS
@@ -89,5 +93,26 @@ public class RespBean {
      */
     public static RespBean error(StatusCode statusCode) {
         return new RespBean(statusCode.getCode(), statusCode.getMsg(), null);
+    }
+
+    /**
+     * 使用自定义状态码和对应的提示，自定义data
+     *
+     * @param statusCode
+     * @param data
+     * @return
+     */
+    public static RespBean error(StatusCode statusCode, Object data) {
+        return new RespBean(statusCode.getCode(), statusCode.getMsg(), data);
+    }
+
+    public static RespBean page(StatusCode statusCode, PageInfo<?> pageInfo) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("pageNum", pageInfo.getPageNum());
+        data.put("pageSize", pageInfo.getPageSize());
+        data.put("total", pageInfo.getTotal());
+        data.put("pages", pageInfo.getPages());
+        data.put("list", pageInfo.getList());
+        return new RespBean(statusCode.getCode(), statusCode.getMsg(), data);
     }
 }

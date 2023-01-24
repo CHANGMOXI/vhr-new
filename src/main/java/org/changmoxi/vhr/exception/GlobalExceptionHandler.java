@@ -3,11 +3,15 @@ package org.changmoxi.vhr.exception;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.RespBean;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 全局异常处理类
@@ -56,6 +60,23 @@ public class GlobalExceptionHandler {
     public RespBean persistenceExceptionHandler(PersistenceException e) {
         //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
         return RespBean.error(CustomizeStatusCode.DATABASE_EXCEPTION);
+    }
+
+    /**
+     * 参数校验异常处理
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public RespBean validationExceptionHandler(MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return RespBean.error(CustomizeStatusCode.PARAMETER_ERROR, errors);
     }
 
     /**

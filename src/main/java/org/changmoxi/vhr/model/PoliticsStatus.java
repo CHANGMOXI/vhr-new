@@ -3,7 +3,7 @@ package org.changmoxi.vhr.model;
 import lombok.Data;
 
 @Data
-public class Nation {
+public class PoliticsStatus {
     private Integer id;
 
     private String name;
