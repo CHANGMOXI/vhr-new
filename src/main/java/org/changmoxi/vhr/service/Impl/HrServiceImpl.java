@@ -9,7 +9,7 @@ import org.changmoxi.vhr.mapper.HrRoleMapper;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.model.RespBean;
 import org.changmoxi.vhr.service.HrService;
-import org.changmoxi.vhr.utils.HrUtils;
+import org.changmoxi.vhr.utils.HrUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class HrServiceImpl implements HrService {
 
     @Override
     public RespBean getAllOtherHrs(String keywords) {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrs(HrUtils.getCurrentHr().getId(), keywords));
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrs(HrUtil.getCurrentHr().getId(), keywords));
     }
 
     @Override

@@ -97,7 +97,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //  ---> 第三个参数 Authentication 则保存了刚刚登录成功的用户信息
                 .successHandler((request, response, authentication) -> {
                     response.setContentType("application/json;charset=utf-8");
-                    PrintWriter out = response.getWriter();
+                    PrintWriter writer = response.getWriter();
                     //登录成功的Hr用户对象
                     Hr hr = (Hr) authentication.getPrincipal();
                     RespBean respBean = RespBean.ok("登录成功!", hr);
@@ -107,9 +107,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     //如果只过滤某个层级下的指定属性，使用LevelPropertyPreFilter过滤器，根据层级过滤属性(比如xxx.xxx.password)
                     SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                     filter.getExcludes().add("password");
-                    out.write(JSON.toJSONString(respBean, filter));
-                    out.flush();
-                    out.close();
+                    writer.write(JSON.toJSONString(respBean, filter));
+                    writer.flush();
+                    writer.close();
                 })
                 /** 登录失败的回调 **/
                 //同样有failureHandler，该方法的参数是 AuthenticationFailureHandler对象
@@ -117,7 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //对于登录失败，会有不同的原因，Exception 则保存了登录失败的原因，可以通过 JSON 将 失败原因 返回到前端
                 .failureHandler((request, response, exception) -> {
                     response.setContentType("application/json;charset=utf-8");
-                    PrintWriter out = response.getWriter();
+                    PrintWriter writer = response.getWriter();
                     RespBean respBean = RespBean.error("登录失败!");
                     if (exception instanceof LockedException) {
                         respBean.setMsg("账号被锁定，请联系管理员!");
@@ -131,9 +131,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         respBean.setMsg("用户名或密码错误，请重新输入!");
                     }
                     //写JSON字符串
-                    out.write(JSON.toJSONString(respBean));
-                    out.flush();
-                    out.close();
+                    writer.write(JSON.toJSONString(respBean));
+                    writer.flush();
+                    writer.close();
                 })
                 .permitAll()
                 .and()
@@ -143,11 +143,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutSuccessHandler((request, response, authentication) -> {
                     response.setContentType("application/json;charset=utf-8");
-                    PrintWriter out = response.getWriter();
+                    PrintWriter writer = response.getWriter();
                     //写JSON字符串
-                    out.write(JSON.toJSONString(RespBean.ok("注销成功!")));
-                    out.flush();
-                    out.close();
+                    writer.write(JSON.toJSONString(RespBean.ok("注销成功!")));
+                    writer.flush();
+                    writer.close();
                 })
                 .permitAll()
                 .and()
@@ -169,16 +169,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     // 前端响应拦截器拦截401响应错误并跳转到登录页面
                     response.setStatus(401);
 
-                    PrintWriter out = response.getWriter();
+                    PrintWriter writer = response.getWriter();
                     RespBean respBean = RespBean.error("访问失败!");
                     if (authException instanceof InsufficientAuthenticationException) {
                         //未登录的非法请求
                         respBean.setMsg("未登录的非法请求，请先登录!");
                     }
                     //写JSON字符串
-                    out.write(JSON.toJSONString(respBean));
-                    out.flush();
-                    out.close();
+                    writer.write(JSON.toJSONString(respBean));
+                    writer.flush();
+                    writer.close();
                 });
     }
 }

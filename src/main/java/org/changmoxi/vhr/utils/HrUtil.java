@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author CZS
  * @create 2023-01-16 16:00
  **/
-public class HrUtils {
+public class HrUtil {
     public static Hr getCurrentHr(){
         return ((Hr) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }

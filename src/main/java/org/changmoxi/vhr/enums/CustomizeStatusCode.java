@@ -17,6 +17,7 @@ public enum CustomizeStatusCode implements StatusCode {
     ERROR_ADD(500, "添加失败!"),
     ERROR_DELETE(500, "删除失败!"),
     ERROR_UPDATE(500, "更新失败!"),
+    ERROR_EXPORT(500, "下载导出文件失败!"),
 
     ERROR_UNKNOWN(500, "服务器冒烟了，请稍后再试!"),
 

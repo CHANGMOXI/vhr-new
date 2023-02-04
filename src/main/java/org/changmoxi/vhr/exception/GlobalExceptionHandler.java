@@ -1,8 +1,10 @@
 package org.changmoxi.vhr.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.RespBean;
+import org.springframework.dao.DataAccessException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +21,7 @@ import java.util.Map;
  * @author CZS
  * @create 2023-01-07 12:05
  **/
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
@@ -29,23 +32,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(SQLException.class)
     public RespBean sqlExceptionHandler(SQLException e) {
+        log.error("====================SQL异常====================");
         if (e instanceof SQLIntegrityConstraintViolationException) {
             //外键关联导致的异常
+            log.error("====================外键关联异常====================");
+            log.error(e.getMessage(), e);
             return RespBean.error(CustomizeStatusCode.DATABASE_VIOLATE_INTEGRITY_CONSTRAINT);
         }
+        log.error(e.getMessage(), e);
         return RespBean.error(CustomizeStatusCode.DATABASE_EXCEPTION);
-    }
-
-    /**
-     * 处理业务异常
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(CustomizeException.class)
-    public RespBean customizeExceptionHandler(CustomizeException e) {
-        //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
-        return RespBean.error(e.getCode(), e.getMsg());
     }
 
     /**
@@ -58,8 +53,37 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(PersistenceException.class)
     public RespBean persistenceExceptionHandler(PersistenceException e) {
-        //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
+        log.error("====================MyBatis异常====================");
+        log.error(e.getMessage(), e);
         return RespBean.error(CustomizeStatusCode.DATABASE_EXCEPTION);
+    }
+
+    /**
+     * DAO异常，包括MyBatis等框架的异常
+     * 比如日期数据错误Incorrect date value，对应DataAccessException异常的子类DataIntegrityViolationException
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public RespBean daoException(DataAccessException e) {
+        log.error("====================DAO异常====================");
+        log.error("异常类型:{}", e.getClass().toString());
+        log.error(e.getMessage(), e);
+        return RespBean.error(CustomizeStatusCode.DATABASE_EXCEPTION);
+    }
+
+    /**
+     * 处理业务异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(CustomizeException.class)
+    public RespBean customizeExceptionHandler(CustomizeException e) {
+        log.error("====================业务异常====================");
+        log.error(e.getMessage(), e);
+        return RespBean.error(e.getCode(), e.getMsg());
     }
 
     /**
@@ -76,6 +100,8 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        log.error("====================请求参数校验异常====================");
+        log.error(e.getMessage(), e);
         return RespBean.error(CustomizeStatusCode.PARAMETER_ERROR, errors);
     }
 
@@ -87,7 +113,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public RespBean exceptionHandler(Exception e) {
-        //TODO log.error(e.getMessage(), e); 由于还没集成日志框架，暂且放着
+        log.error("====================未知异常====================");
+        log.error(e.getMessage(), e);
         return RespBean.error(CustomizeStatusCode.ERROR_UNKNOWN);
     }
 }

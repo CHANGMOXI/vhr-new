@@ -103,6 +103,13 @@
         where departmentId = #{id}
     </select>
 
+    <select id="getAllDepartments" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from department
+        where deleted = false
+    </select>
+
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>

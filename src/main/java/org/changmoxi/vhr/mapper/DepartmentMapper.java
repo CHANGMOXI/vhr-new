@@ -24,4 +24,6 @@ public interface DepartmentMapper {
     int addDepartmentAndReturnLastInsertId(Department department);
 
     int getEmployeeCountOfDepartment(Integer id);
+
+    List<Department> getAllDepartments();
 }

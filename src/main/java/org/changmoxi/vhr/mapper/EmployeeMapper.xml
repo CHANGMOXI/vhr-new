@@ -34,27 +34,43 @@
     </resultMap>
 
     <resultMap id="AllEmployeeInfo" type="org.changmoxi.vhr.model.Employee" extends="BaseResultMap">
-        <!--复杂属性的映射需要另外处理，对象(一对一)用association-->
-        <association property="nation" javaType="org.changmoxi.vhr.model.Nation">
-            <id column="nId" property="id" jdbcType="INTEGER"/>
-            <result column="nName" property="name" jdbcType="VARCHAR"/>
-        </association>
-        <association property="politicsStatus" javaType="org.changmoxi.vhr.model.PoliticsStatus">
-            <id column="pId" property="id" jdbcType="INTEGER"/>
-            <result column="pName" property="name" jdbcType="VARCHAR"/>
-        </association>
-        <association property="department" javaType="org.changmoxi.vhr.model.Department">
-            <id column="dId" property="id" jdbcType="INTEGER"/>
-            <result column="dName" property="name" jdbcType="VARCHAR"/>
-        </association>
-        <association property="jobLevel" javaType="org.changmoxi.vhr.model.JobLevel">
-            <id column="jId" property="id" jdbcType="INTEGER"/>
-            <result column="jName" property="name" jdbcType="VARCHAR"/>
-        </association>
-        <association property="position" javaType="org.changmoxi.vhr.model.Position">
-            <id column="posId" property="id" jdbcType="INTEGER"/>
-            <result column="posName" property="name" jdbcType="VARCHAR"/>
-        </association>
+        <result column="nName" property="nationName" jdbcType="VARCHAR"/>
+        <result column="pName" property="politicsStatusName" jdbcType="VARCHAR"/>
+        <result column="dName" property="departmentName" jdbcType="VARCHAR"/>
+        <result column="jName" property="jobLevelName" jdbcType="VARCHAR"/>
+        <result column="posName" property="positionName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="ExportEmployeeInfo" type="org.changmoxi.vhr.dto.EmployeeExportDTO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="CHAR"/>
+        <result column="birthday" property="birthday" jdbcType="DATE"/>
+        <result column="idCard" property="idCard" jdbcType="CHAR"/>
+        <result column="wedlock" property="wedlock" jdbcType="CHAR"/>
+        <result column="nName" property="nationName" jdbcType="VARCHAR"/>
+        <result column="nativePlace" property="nativePlace" jdbcType="VARCHAR"/>
+        <result column="pName" property="politicsStatusName" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="dName" property="departmentName" jdbcType="VARCHAR"/>
+        <result column="jName" property="jobLevelName" jdbcType="VARCHAR"/>
+        <result column="posName" property="positionName" jdbcType="VARCHAR"/>
+        <result column="engageForm" property="engageForm" jdbcType="VARCHAR"/>
+        <result column="highestDegree" property="highestDegree" jdbcType="CHAR"/>
+        <result column="major" property="major" jdbcType="VARCHAR"/>
+        <result column="school" property="school" jdbcType="VARCHAR"/>
+        <result column="employmentDate" property="employmentDate" jdbcType="DATE"/>
+        <result column="workStatus" property="workStatus" jdbcType="CHAR"/>
+        <result column="workId" property="workId" jdbcType="CHAR"/>
+        <result column="contractTerm" property="contractTerm" jdbcType="DOUBLE"/>
+        <result column="conversionDate" property="conversionDate" jdbcType="DATE"/>
+        <result column="dimissionDate" property="dimissionDate" jdbcType="DATE"/>
+        <result column="beginContractDate" property="beginContractDate" jdbcType="DATE"/>
+        <result column="endContractDate" property="endContractDate" jdbcType="DATE"/>
+        <result column="seniority" property="seniority" jdbcType="INTEGER"/>
+        <result column="deleted" property="deleted" jdbcType="BIT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -95,15 +111,10 @@
         e.`endContractDate`,
         e.`seniority`,
         e.`deleted`,
-        n.`id` nId,
         n.`name` nName,
-        p.`id` pId,
         p.`name` pName,
-        d.`id` dId,
         d.`name` dName,
-        j.`id` jId,
         j.`name` jName,
-        pos.`id` posId,
         pos.`name` posName
         from employee e
         inner join nation n on e.`nationId` = n.`id`
@@ -113,16 +124,158 @@
         inner join position pos on e.`positionId` = pos.`id`
         <where>
             and e.`deleted` = false
-            <if test="keywords != null and keywords != ''">
-                and e.`name` like CONCAT('%',#{keywords},'%')
+            <if test="search.name != null and search.name != ''">
+                and e.`name` like CONCAT('%',#{search.name},'%')
+            </if>
+            <if test="search.nationId != null">
+                and e.`nationId` = #{search.nationId}
+            </if>
+            <if test="search.politicsId != null">
+                and e.`politicsId` = #{search.politicsId}
+            </if>
+            <if test="search.departmentId != null">
+                and e.`departmentId` = #{search.departmentId}
+            </if>
+            <if test="search.jobLevelId != null">
+                and e.`jobLevelId` = #{search.jobLevelId}
+            </if>
+            <if test="search.positionId != null">
+                and e.`positionId` = #{search.positionId}
+            </if>
+            <if test="search.engageForm != null and search.engageForm != ''">
+                and e.`engageForm` = #{search.engageForm}
+            </if>
+            <if test="search.employmentDateScope != null and search.employmentDateScope.length > 0">
+                and (e.`employmentDate` between #{search.employmentDateScope[0]} and #{search.employmentDateScope[1]})
+            </if>
+            <if test="search.workStatus != null and search.workStatus != ''">
+                and e.`workStatus` = #{search.workStatus}
             </if>
         </where>
+        order by e.`id` ASC
+    </select>
+
+    <select id="getExportEmployeesByPage" resultMap="ExportEmployeeInfo">
+        select e.`id`,
+        e.`name`,
+        e.`gender`,
+        e.`birthday`,
+        e.`idCard`,
+        e.`wedlock`,
+        e.`nativePlace`,
+        e.`email`,
+        e.`phone`,
+        e.`address`,
+        e.`engageForm`,
+        e.`highestDegree`,
+        e.`major`,
+        e.`school`,
+        e.`employmentDate`,
+        e.`workStatus`,
+        e.`workId`,
+        e.`contractTerm`,
+        e.`conversionDate`,
+        e.`dimissionDate`,
+        e.`beginContractDate`,
+        e.`endContractDate`,
+        e.`seniority`,
+        e.`deleted`,
+        n.`name` nName,
+        p.`name` pName,
+        d.`name` dName,
+        j.`name` jName,
+        pos.`name` posName
+        from employee e
+        inner join nation n on e.`nationId` = n.`id`
+        inner join politicsstatus p on e.`politicsId` = p.`id`
+        inner join department d on e.`departmentId` = d.`id`
+        inner join joblevel j on e.`jobLevelId` = j.`id`
+        inner join position pos on e.`positionId` = pos.`id`
+        <where>
+            and e.`deleted` = false
+            <if test="search.name != null and search.name != ''">
+                and e.`name` like CONCAT('%',#{search.name},'%')
+            </if>
+            <if test="search.nationId != null">
+                and e.`nationId` = #{search.nationId}
+            </if>
+            <if test="search.politicsId != null">
+                and e.`politicsId` = #{search.politicsId}
+            </if>
+            <if test="search.departmentId != null">
+                and e.`departmentId` = #{search.departmentId}
+            </if>
+            <if test="search.jobLevelId != null">
+                and e.`jobLevelId` = #{search.jobLevelId}
+            </if>
+            <if test="search.positionId != null">
+                and e.`positionId` = #{search.positionId}
+            </if>
+            <if test="search.engageForm != null and search.engageForm != ''">
+                and e.`engageForm` = #{search.engageForm}
+            </if>
+            <if test="search.employmentDateScope != null and search.employmentDateScope.length > 0">
+                and (e.`employmentDate` between #{search.employmentDateScope[0]} and #{search.employmentDateScope[1]})
+            </if>
+            <if test="search.workStatus != null and search.workStatus != ''">
+                and e.`workStatus` = #{search.workStatus}
+            </if>
+        </where>
+        order by e.`id` ASC
+        <if test="offset != null and exportPageSize != null">
+            limit #{offset}, #{exportPageSize}
+        </if>
     </select>
 
     <select id="getMaxWorkId" resultType="java.lang.Integer">
         select MAX(`workId`)
         from employee
     </select>
+
+    <select id="getEmployeesTotalCount" resultType="java.lang.Integer">
+        select count(*)
+        from employee
+        where `deleted` = false
+    </select>
+
+    <insert id="batchInsertEmployees">
+        insert into employee (name, gender, birthday, idCard, wedlock, nationId, nativePlace, politicsId,
+        email, phone, address, departmentId, jobLevelId, positionId, engageForm, highestDegree, major, school,
+        employmentDate, workStatus, workId, contractTerm, conversionDate, dimissionDate, beginContractDate,
+        endContractDate, seniority)
+        values
+        <foreach collection="employees" item="e" separator=",">
+            (
+            #{e.name},
+            #{e.gender},
+            #{e.birthday},
+            #{e.idCard},
+            #{e.wedlock},
+            #{e.nationId},
+            #{e.nativePlace},
+            #{e.politicsId},
+            #{e.email},
+            #{e.phone},
+            #{e.address},
+            #{e.departmentId},
+            #{e.jobLevelId},
+            #{e.positionId},
+            #{e.engageForm},
+            #{e.highestDegree},
+            #{e.major},
+            #{e.school},
+            #{e.employmentDate},
+            #{e.workStatus},
+            #{e.workId},
+            #{e.contractTerm},
+            #{e.conversionDate},
+            #{e.dimissionDate},
+            #{e.beginContractDate},
+            #{e.endContractDate},
+            #{e.seniority}
+            )
+        </foreach>
+    </insert>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -161,37 +314,37 @@
             <if test="id != null">
                 id,
             </if>
-            <if test="name != null">
+            <if test="name != null and name != ''">
                 name,
             </if>
-            <if test="gender != null">
+            <if test="gender != null and gender != ''">
                 gender,
             </if>
             <if test="birthday != null">
                 birthday,
             </if>
-            <if test="idCard != null">
+            <if test="idCard != null and idCard != ''">
                 idCard,
             </if>
-            <if test="wedlock != null">
+            <if test="wedlock != null and wedlock != ''">
                 wedlock,
             </if>
             <if test="nationId != null">
                 nationId,
             </if>
-            <if test="nativePlace != null">
+            <if test="nativePlace != null and nativePlace != ''">
                 nativePlace,
             </if>
             <if test="politicsId != null">
                 politicsId,
             </if>
-            <if test="email != null">
+            <if test="email != null and email != ''">
                 email,
             </if>
-            <if test="phone != null">
+            <if test="phone != null and phone != ''">
                 phone,
             </if>
-            <if test="address != null">
+            <if test="address != null and address != ''">
                 address,
             </if>
             <if test="departmentId != null">
@@ -203,25 +356,25 @@
             <if test="positionId != null">
                 positionId,
             </if>
-            <if test="engageForm != null">
+            <if test="engageForm != null and engageForm != ''">
                 engageForm,
             </if>
-            <if test="highestDegree != null">
+            <if test="highestDegree != null and highestDegree != ''">
                 highestDegree,
             </if>
-            <if test="major != null">
+            <if test="major != null and major != ''">
                 major,
             </if>
-            <if test="school != null">
+            <if test="school != null and school != ''">
                 school,
             </if>
             <if test="employmentDate != null">
                 employmentDate,
             </if>
-            <if test="workStatus != null">
+            <if test="workStatus != null and workStatus != ''">
                 workStatus,
             </if>
-            <if test="workId != null">
+            <if test="workId != null and workId != ''">
                 workId,
             </if>
             <if test="contractTerm != null">
@@ -250,37 +403,37 @@
             <if test="id != null">
                 #{id,jdbcType=INTEGER},
             </if>
-            <if test="name != null">
+            <if test="name != null and name != ''">
                 #{name,jdbcType=VARCHAR},
             </if>
-            <if test="gender != null">
+            <if test="gender != null and gender != ''">
                 #{gender,jdbcType=CHAR},
             </if>
             <if test="birthday != null">
                 #{birthday,jdbcType=DATE},
             </if>
-            <if test="idCard != null">
+            <if test="idCard != null and idCard != ''">
                 #{idCard,jdbcType=CHAR},
             </if>
-            <if test="wedlock != null">
+            <if test="wedlock != null and wedlock != ''">
                 #{wedlock,jdbcType=CHAR},
             </if>
             <if test="nationId != null">
                 #{nationId,jdbcType=INTEGER},
             </if>
-            <if test="nativePlace != null">
+            <if test="nativePlace != null and nativePlace != ''">
                 #{nativePlace,jdbcType=VARCHAR},
             </if>
             <if test="politicsId != null">
                 #{politicsId,jdbcType=INTEGER},
             </if>
-            <if test="email != null">
+            <if test="email != null and email != ''">
                 #{email,jdbcType=VARCHAR},
             </if>
-            <if test="phone != null">
+            <if test="phone != null and phone != ''">
                 #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="address != null">
+            <if test="address != null and address != ''">
                 #{address,jdbcType=VARCHAR},
             </if>
             <if test="departmentId != null">
@@ -292,25 +445,25 @@
             <if test="positionId != null">
                 #{positionId,jdbcType=INTEGER},
             </if>
-            <if test="engageForm != null">
+            <if test="engageForm != null and engageForm != ''">
                 #{engageForm,jdbcType=VARCHAR},
             </if>
-            <if test="highestDegree != null">
+            <if test="highestDegree != null and highestDegree != ''">
                 #{highestDegree,jdbcType=CHAR},
             </if>
-            <if test="major != null">
+            <if test="major != null and major != ''">
                 #{major,jdbcType=VARCHAR},
             </if>
-            <if test="school != null">
+            <if test="school != null and school != ''">
                 #{school,jdbcType=VARCHAR},
             </if>
             <if test="employmentDate != null">
                 #{employmentDate,jdbcType=DATE},
             </if>
-            <if test="workStatus != null">
+            <if test="workStatus != null and workStatus != ''">
                 #{workStatus,jdbcType=CHAR},
             </if>
-            <if test="workId != null">
+            <if test="workId != null and workId != ''">
                 #{workId,jdbcType=CHAR},
             </if>
             <if test="contractTerm != null">
@@ -340,37 +493,37 @@
     <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.Employee">
         update employee
         <set>
-            <if test="name != null">
+            <if test="name != null and name != ''">
                 name = #{name,jdbcType=VARCHAR},
             </if>
-            <if test="gender != null">
+            <if test="gender != null and gender != ''">
                 gender = #{gender,jdbcType=CHAR},
             </if>
             <if test="birthday != null">
                 birthday = #{birthday,jdbcType=DATE},
             </if>
-            <if test="idCard != null">
+            <if test="idCard != null and idCard != ''">
                 idCard = #{idCard,jdbcType=CHAR},
             </if>
-            <if test="wedlock != null">
+            <if test="wedlock != null and wedlock != ''">
                 wedlock = #{wedlock,jdbcType=CHAR},
             </if>
             <if test="nationId != null">
                 nationId = #{nationId,jdbcType=INTEGER},
             </if>
-            <if test="nativePlace != null">
+            <if test="nativePlace != null and nativePlace != ''">
                 nativePlace = #{nativePlace,jdbcType=VARCHAR},
             </if>
             <if test="politicsId != null">
                 politicsId = #{politicsId,jdbcType=INTEGER},
             </if>
-            <if test="email != null">
+            <if test="email != null and email != ''">
                 email = #{email,jdbcType=VARCHAR},
             </if>
-            <if test="phone != null">
+            <if test="phone != null and phone != ''">
                 phone = #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="address != null">
+            <if test="address != null and address != ''">
                 address = #{address,jdbcType=VARCHAR},
             </if>
             <if test="departmentId != null">
@@ -382,25 +535,25 @@
             <if test="positionId != null">
                 positionId = #{positionId,jdbcType=INTEGER},
             </if>
-            <if test="engageForm != null">
+            <if test="engageForm != null and engageForm != ''">
                 engageForm = #{engageForm,jdbcType=VARCHAR},
             </if>
-            <if test="highestDegree != null">
+            <if test="highestDegree != null and highestDegree != ''">
                 highestDegree = #{highestDegree,jdbcType=CHAR},
             </if>
-            <if test="major != null">
+            <if test="major != null and major != ''">
                 major = #{major,jdbcType=VARCHAR},
             </if>
-            <if test="school != null">
+            <if test="school != null and school != ''">
                 school = #{school,jdbcType=VARCHAR},
             </if>
             <if test="employmentDate != null">
                 employmentDate = #{employmentDate,jdbcType=DATE},
             </if>
-            <if test="workStatus != null">
+            <if test="workStatus != null and workStatus != ''">
                 workStatus = #{workStatus,jdbcType=CHAR},
             </if>
-            <if test="workId != null">
+            <if test="workId != null and workId != ''">
                 workId = #{workId,jdbcType=CHAR},
             </if>
             <if test="contractTerm != null">
