@@ -96,10 +96,19 @@ axios.interceptors.response.use(success => {
 ```
 
 
-
 ### MySQL表主键id重新自增排序
 ```sql
 SET @i=0;
 UPDATE `employee` SET `id` = (@i:=@i+1);
 ALTER TABLE `employee` AUTO_INCREMENT = 0;
 ```
+
+
+### 项目模块化改造
+- 顶层父模块: vhr
+  - 服务端模块: vhr-server
+    - 服务端子模块: vhr-model   实体类、DTO
+    - 服务端子模块: vhr-common  依赖 vhr-model    RespBean、全局异常处理、读取配置信息类
+    - 服务端子模块: vhr-mapper  依赖 vhr-common   Mapper
+    - 服务端子模块: vhr-service 依赖 vhr-mapper   Service、EasyExcel的监听器、工具类
+    - 服务端子模块: vhr-web     依赖 vhr-service  配置类、Controller、启动类

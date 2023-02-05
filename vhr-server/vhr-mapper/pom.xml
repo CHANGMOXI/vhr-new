@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.changmoxi</groupId>
+        <artifactId>vhr-server</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>vhr-mapper</artifactId>
+    <name>vhr-mapper</name>
+
+    <dependencies>
+        <!--依赖vhr-common-->
+        <dependency>
+            <groupId>org.changmoxi</groupId>
+            <artifactId>vhr-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--如果xml文件和mapper接口放在同一个包，就需要如下配置，防止默认打包时java目录下的xml文件被忽略-->
+        <!--如果xml文件放在resources/mapper包，就不需要这里的配置
+            但是要在application.yml文件中指定mybatis的 mapper-locations: classpath:mapper/*.xml -->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+</project>

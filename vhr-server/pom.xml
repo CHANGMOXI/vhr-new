@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.changmoxi</groupId>
+        <artifactId>vhr</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>vhr-server</artifactId>
+    <name>vhr-server</name>
+    <!--父模块的打包方式为pom-->
+    <packaging>pom</packaging>
+
+    <!--子模块-->
+    <modules>
+        <!-- 关系: model <==依赖 common <==依赖 mapper <==依赖 service <==依赖 web -->
+        <module>vhr-model</module>
+        <module>vhr-common</module>
+        <module>vhr-mapper</module>
+        <module>vhr-service</module>
+        <module>vhr-web</module>
+    </modules>
+
+</project>
