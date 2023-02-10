@@ -1,7 +1,7 @@
 package org.changmoxi.vhr;
 
 import org.changmoxi.vhr.common.info.EmployeeFixedInfo;
-import org.changmoxi.vhr.listener.EmployeeImportListener;
+import org.changmoxi.vhr.common.listener.EmployeeImportListener;
 import org.changmoxi.vhr.mapper.EmployeeMapper;
 import org.changmoxi.vhr.service.EmployeeService;
 import org.junit.jupiter.api.Test;

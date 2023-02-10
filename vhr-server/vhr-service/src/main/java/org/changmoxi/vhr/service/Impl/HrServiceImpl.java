@@ -9,7 +9,7 @@ import org.changmoxi.vhr.mapper.HrMapper;
 import org.changmoxi.vhr.mapper.HrRoleMapper;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
-import org.changmoxi.vhr.utils.HrUtil;
+import org.changmoxi.vhr.common.utils.HrUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

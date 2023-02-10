@@ -94,7 +94,7 @@ CREATE TABLE `employee` (
   `nationId` int(8) DEFAULT NULL COMMENT '民族',
   `nativePlace` varchar(20) DEFAULT NULL COMMENT '籍贯',
   `politicsId` int(8) DEFAULT NULL COMMENT '政治面貌',
-  `email` varchar(20) DEFAULT NULL COMMENT '邮箱',
+  `email` varchar(254) DEFAULT NULL COMMENT '邮箱',
   `phone` varchar(11) DEFAULT NULL COMMENT '电话号码',
   `address` varchar(64) DEFAULT NULL COMMENT '联系地址',
   `departmentId` int(11) DEFAULT NULL COMMENT '所属部门',

@@ -277,6 +277,51 @@
         </foreach>
     </insert>
 
+    <select id="getEmployeeAllInfoById" resultMap="AllEmployeeInfo">
+        select e.`id`,
+               e.`name`,
+               e.`gender`,
+               e.`birthday`,
+               e.`idCard`,
+               e.`wedlock`,
+               e.`nationId`,
+               e.`nativePlace`,
+               e.`politicsId`,
+               e.`email`,
+               e.`phone`,
+               e.`address`,
+               e.`departmentId`,
+               e.`jobLevelId`,
+               e.`positionId`,
+               e.`engageForm`,
+               e.`highestDegree`,
+               e.`major`,
+               e.`school`,
+               e.`employmentDate`,
+               e.`workStatus`,
+               e.`workId`,
+               e.`contractTerm`,
+               e.`conversionDate`,
+               e.`dimissionDate`,
+               e.`beginContractDate`,
+               e.`endContractDate`,
+               e.`seniority`,
+               e.`deleted`,
+               n.`name`   nName,
+               p.`name`   pName,
+               d.`name`   dName,
+               j.`name`   jName,
+               pos.`name` posName
+        from employee e
+                 inner join nation n on e.`nationId` = n.`id`
+                 inner join politicsstatus p on e.`politicsId` = p.`id`
+                 inner join department d on e.`departmentId` = d.`id`
+                 inner join joblevel j on e.`jobLevelId` = j.`id`
+                 inner join position pos on e.`positionId` = pos.`id`
+        where e.`id` = #{id}
+          and `e`.deleted = false
+    </select>
+
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
@@ -309,6 +354,16 @@
     </insert>
 
     <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Employee">
+        <!--
+            将insert插入的数据的主键id返回到Department对象中
+            select last_insert_id(): 得到刚insert进去记录的主键值，只适用于自增主键
+            keyProperty: 将查询到的主键id值，设置到parameterType指定的对象的keyProperty指定的属性
+            order:select last_insert_id()执行顺序，相对于insert语句来说它的执行顺序
+            resultType: 指定select last_insert_id()的结果类型，也就是id的类型
+        -->
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         insert into employee
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">

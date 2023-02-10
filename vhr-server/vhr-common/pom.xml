@@ -11,29 +11,11 @@
     <name>vhr-common</name>
 
     <dependencies>
-        <!--依赖vhr-model-->
+        <!--依赖vhr-mapper-->
         <dependency>
             <groupId>org.changmoxi</groupId>
-            <artifactId>vhr-model</artifactId>
+            <artifactId>vhr-mapper</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <!--数据库相关依赖放在vhr-common-->
-        <!--本来应该放在vhr-mapper，但全局异常处理也需要MyBatis等相关依赖-->
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <!--            <scope>runtime</scope>-->
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.2.8</version>
         </dependency>
 
         <!--使用@ConfigurationProperties需要引入此依赖，否则有红色提示，不引入依赖也能正常使用-->

@@ -1,4 +1,4 @@
-package org.changmoxi.vhr.utils;
+package org.changmoxi.vhr.common.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

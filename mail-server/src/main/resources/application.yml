@@ -1,0 +1,36 @@
+server:
+  port: 8082
+
+spring:
+  mail:
+    # 邮件服务协议
+    protocol: smtp
+    # SMTP服务器地址
+    host: smtp.qq.com
+    # 发送邮件的SMTP服务器端口，465或587
+    port: 465
+    # 邮箱用户名
+    username: 2143204964@qq.com
+    # 授权码
+    password: rcpjeqirmeidgdii
+    # 默认邮件编码
+    default-encoding: utf-8
+    properties:
+      mail:
+        # 开启日志，打印邮件发送过程在控制台
+        debug: true
+        smtp:
+          socketFactory:
+            # SSL加密工厂类
+            class: javax.net.ssl.SSLSocketFactory
+
+rocketmq:
+  name-server: 43.138.236.83:9876
+
+#常用的固定信息
+mail-consumer-info:
+  consumerGroup: cg_mail
+  topic: topic_mail
+  welcomeMailInfo:
+    tagWelcome: tag_welcome
+    templateWelcomeMail: welcomeMail.html

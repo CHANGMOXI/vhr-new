@@ -1,4 +1,4 @@
-package org.changmoxi.vhr.utils;
+package org.changmoxi.vhr.common.utils;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;

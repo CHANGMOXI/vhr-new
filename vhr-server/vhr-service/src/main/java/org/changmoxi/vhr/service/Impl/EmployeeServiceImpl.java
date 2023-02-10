@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.message.basic.MailProducer;
 import org.changmoxi.vhr.dto.EmployeeExportDTO;
 import org.changmoxi.vhr.dto.EmployeeSearchDTO;
 import org.changmoxi.vhr.mapper.*;
@@ -44,6 +45,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Resource
     private PositionMapper positionMapper;
 
+    @Resource
+    private MailProducer mailProducer;
+
     @Override
     public List<Employee> getEmployeesByPage(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
         if (ArrayUtils.isNotEmpty(employeeSearchDTO.getEmploymentDateScope()) && employeeSearchDTO.getEmploymentDateScope().length == 1) {
@@ -63,7 +67,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public RespBean addEmployee(Employee employee) {
         employee.CalculateContractTerm();
-        return employeeMapper.insertSelective(employee) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_ADD) : RespBean.error(CustomizeStatusCode.ERROR_ADD);
+        int insertCount = employeeMapper.insertSelective(employee);
+        if (insertCount == 1) {
+            Employee insertEmployee = employeeMapper.getEmployeeAllInfoById(employee.getId());
+            // 发送入职欢迎邮件
+            mailProducer.sendWelcomeMail(insertEmployee);
+        }
+        return insertCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_ADD) : RespBean.error(CustomizeStatusCode.ERROR_ADD);
     }
 
     @Override

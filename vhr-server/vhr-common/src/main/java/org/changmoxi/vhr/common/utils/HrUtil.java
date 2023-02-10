@@ -1,4 +1,4 @@
-package org.changmoxi.vhr.utils;
+package org.changmoxi.vhr.common.utils;
 
 import org.changmoxi.vhr.model.Hr;
 import org.springframework.security.core.context.SecurityContextHolder;

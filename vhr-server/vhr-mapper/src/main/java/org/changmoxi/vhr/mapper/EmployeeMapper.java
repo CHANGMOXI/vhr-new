@@ -30,4 +30,6 @@ public interface EmployeeMapper {
     Integer getEmployeesTotalCount();
 
     int batchInsertEmployees(List<EmployeeImportDTO> employees);
+
+    Employee getEmployeeAllInfoById(Integer id);
 }

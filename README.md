@@ -107,8 +107,14 @@ ALTER TABLE `employee` AUTO_INCREMENT = 0;
 ### 项目模块化改造
 - 顶层父模块: vhr
   - 服务端模块: vhr-server
-    - 服务端子模块: vhr-model   实体类、DTO
-    - 服务端子模块: vhr-common  依赖 vhr-model    RespBean、全局异常处理、读取配置信息类
-    - 服务端子模块: vhr-mapper  依赖 vhr-common   Mapper
-    - 服务端子模块: vhr-service 依赖 vhr-mapper   Service、EasyExcel的监听器、工具类
-    - 服务端子模块: vhr-web     依赖 vhr-service  配置类、Controller、启动类
+    - 服务端子模块: vhr-model
+      - 实体类、DTO
+    - 服务端子模块: vhr-mapper  依赖 vhr-model
+      - Mapper
+    - 服务端子模块: vhr-common  依赖 vhr-mapper
+      - RespBean、全局异常处理、读取配置信息类、工具类、RocketMQ生产者
+    - 服务端子模块: vhr-service 依赖 vhr-common
+      - Service
+    - 服务端子模块: vhr-web     依赖 vhr-service
+      - 配置类、Controller、启动类
+  - 邮件服务模块: mail-server 依赖vhr-model部分依赖，主要为了使用其中一些类

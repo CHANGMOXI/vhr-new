@@ -11,10 +11,10 @@
     <name>vhr-service</name>
 
     <dependencies>
-        <!--依赖vhr-mapper-->
+        <!--依赖vhr-common-->
         <dependency>
             <groupId>org.changmoxi</groupId>
-            <artifactId>vhr-mapper</artifactId>
+            <artifactId>vhr-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

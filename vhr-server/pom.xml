@@ -14,10 +14,10 @@
 
     <!--子模块-->
     <modules>
-        <!-- 关系: model <==依赖 common <==依赖 mapper <==依赖 service <==依赖 web -->
+        <!-- 关系: model <==依赖 mapper <==依赖 common <==依赖 service <==依赖 web -->
         <module>vhr-model</module>
-        <module>vhr-common</module>
         <module>vhr-mapper</module>
+        <module>vhr-common</module>
         <module>vhr-service</module>
         <module>vhr-web</module>
     </modules>

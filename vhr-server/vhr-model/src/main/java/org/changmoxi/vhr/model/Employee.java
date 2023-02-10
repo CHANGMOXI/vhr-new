@@ -6,12 +6,13 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
-public class Employee {
+public class Employee implements Serializable {
     private Integer id;
 
     @NotBlank(message = "员工姓名不能为空")
