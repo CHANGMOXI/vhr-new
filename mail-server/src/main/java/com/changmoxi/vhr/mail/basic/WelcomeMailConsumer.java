@@ -5,15 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.annotation.SelectorType;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.changmoxi.vhr.dto.EmployeeMailDTO;
 import org.changmoxi.vhr.dto.MailDTO;
-import org.changmoxi.vhr.model.Employee;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author CZS
@@ -23,7 +21,7 @@ import java.util.Map;
 @Component
 @RocketMQMessageListener(consumerGroup = "${mail-consumer-info.consumerGroup}", topic = "${mail-consumer-info.topic}",
         selectorType = SelectorType.TAG, selectorExpression = "${mail-consumer-info.welcomeMailInfo.tagWelcome}")
-public class WelcomeMailConsumer implements RocketMQListener<Employee> {
+public class WelcomeMailConsumer implements RocketMQListener<EmployeeMailDTO> {
     @Resource
     private MailService mailService;
 
@@ -31,7 +29,7 @@ public class WelcomeMailConsumer implements RocketMQListener<Employee> {
     private String templateWelcomeMail;
 
     @Override
-    public void onMessage(Employee message) {
+    public void onMessage(EmployeeMailDTO message) {
         // TODO 消费者无法避免消息重复，需要业务服务来保证消息消费 幂等
         log.info("WelcomeMailConsumer 接收到消息: {}", message);
         Context context = new Context();

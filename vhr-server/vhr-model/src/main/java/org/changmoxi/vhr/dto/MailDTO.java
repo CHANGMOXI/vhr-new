@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -19,7 +18,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MailDTO implements Serializable {
+public class MailDTO {
     private String id;
     /**
      * 发送者

@@ -11,12 +11,15 @@ import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.changmoxi.vhr.dto.EmployeeErrorDTO;
-import org.changmoxi.vhr.dto.EmployeeImportDTO;
 import org.changmoxi.vhr.common.info.EmployeeFixedInfo;
 import org.changmoxi.vhr.common.info.RegexInfo;
-import org.changmoxi.vhr.mapper.EmployeeMapper;
+import org.changmoxi.vhr.common.message.basic.MailProducer;
 import org.changmoxi.vhr.common.utils.SpringContextHolder;
+import org.changmoxi.vhr.dto.EmployeeErrorDTO;
+import org.changmoxi.vhr.dto.EmployeeImportDTO;
+import org.changmoxi.vhr.dto.EmployeeMailDTO;
+import org.changmoxi.vhr.mapper.EmployeeMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.CollectionUtils;
 
@@ -81,6 +84,10 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
      * 正则表达式
      */
     private static final RegexInfo REGEX_INFO = SpringContextHolder.getBean(RegexInfo.class);
+    /**
+     * 邮件消息生产者
+     */
+    private MailProducer mailProducer = SpringContextHolder.getBean(MailProducer.class);
 
     /**
      * 读取数据而不需要收集错误数据，使用这个构造器，每次创建Listener的时候需要把Spring管理的类(比如Mapper)传进来
@@ -175,6 +182,14 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
         try {
             employeeMapper.batchInsertEmployees(cachedDataList);
+            // 存储完成，批量发送入职欢迎邮件
+            List<EmployeeMailDTO> employeeMailDTOList = new ArrayList<>();
+            cachedDataList.forEach(employeeImportDTO -> {
+                EmployeeMailDTO employeeMailDTO = new EmployeeMailDTO();
+                BeanUtils.copyProperties(employeeImportDTO, employeeMailDTO);
+                employeeMailDTOList.add(employeeMailDTO);
+            });
+            mailProducer.sendBatchWelcomeMails(employeeMailDTOList);
         } catch (DataAccessException e) {
             // 捕获数据入库异常
             // 如果存在校验通过后仍不符合MySQL要求的数据入库，会报错，捕获异常并全局处理返回提示，同时这种情况下当前批次的数据都不会入库

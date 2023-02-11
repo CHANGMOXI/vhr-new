@@ -8,10 +8,12 @@ import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.exception.CustomizeException;
 import org.changmoxi.vhr.common.message.basic.MailProducer;
 import org.changmoxi.vhr.dto.EmployeeExportDTO;
+import org.changmoxi.vhr.dto.EmployeeMailDTO;
 import org.changmoxi.vhr.dto.EmployeeSearchDTO;
 import org.changmoxi.vhr.mapper.*;
 import org.changmoxi.vhr.model.*;
 import org.changmoxi.vhr.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -71,7 +73,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (insertCount == 1) {
             Employee insertEmployee = employeeMapper.getEmployeeAllInfoById(employee.getId());
             // 发送入职欢迎邮件
-            mailProducer.sendWelcomeMail(insertEmployee);
+            EmployeeMailDTO employeeMailDTO = new EmployeeMailDTO();
+            BeanUtils.copyProperties(insertEmployee, employeeMailDTO);
+            mailProducer.sendWelcomeMail(employeeMailDTO);
         }
         return insertCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_ADD) : RespBean.error(CustomizeStatusCode.ERROR_ADD);
     }

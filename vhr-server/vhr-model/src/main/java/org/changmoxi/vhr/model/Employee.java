@@ -3,16 +3,15 @@ package org.changmoxi.vhr.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import javax.validation.constraints.Pattern;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
-public class Employee implements Serializable {
+public class Employee {
     private Integer id;
 
     @NotBlank(message = "员工姓名不能为空")
@@ -32,6 +31,7 @@ public class Employee implements Serializable {
     private Date birthday;
 
     @NotBlank(message = "身份证号码不能为空")
+    @Pattern(regexp = "^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$", message = "身份证号码格式不正确")
     private String idCard;
 
     @NotBlank(message = "婚姻状况不能为空")
@@ -57,10 +57,11 @@ public class Employee implements Serializable {
     private String politicsStatusName;
 
     @NotBlank(message = "电话号码不能为空")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "电话号码格式不正确")
     private String phone;
 
-    @Email(message = "电子邮箱格式错误")
     @NotBlank(message = "电子邮箱不能为空")
+    @Pattern(regexp = "^[a-zA-Z1-9]([a-zA-Z0-9]*[-_]?[a-zA-Z0-9]+)*@[a-zA-Z1-9]([a-zA-Z0-9]*[-_]?[a-zA-Z0-9]+)*[\\.][a-zA-Z]{2,3}([\\.][a-zA-Z]{2,3})*$", message = "电子邮箱格式不正确")
     private String email;
 
     @NotBlank(message = "联系地址不能为空")

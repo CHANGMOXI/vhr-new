@@ -18,7 +18,7 @@ spring:
     properties:
       mail:
         # 开启日志，打印邮件发送过程在控制台
-        debug: true
+#        debug: true
         smtp:
           socketFactory:
             # SSL加密工厂类
