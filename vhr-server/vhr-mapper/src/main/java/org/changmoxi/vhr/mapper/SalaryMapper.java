@@ -2,6 +2,8 @@ package org.changmoxi.vhr.mapper;
 
 import org.changmoxi.vhr.model.Salary;
 
+import java.util.List;
+
 public interface SalaryMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,6 @@ public interface SalaryMapper {
     int updateByPrimaryKeySelective(Salary record);
 
     int updateByPrimaryKey(Salary record);
+
+    List<Salary> getAllSalaries();
 }

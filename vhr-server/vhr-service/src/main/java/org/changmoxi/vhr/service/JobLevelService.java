@@ -9,7 +9,7 @@ import org.changmoxi.vhr.model.JobLevel;
  **/
 public interface JobLevelService {
     /**
-     * 返回所有职称数据
+     * 获取所有职称数据
      *
      * @return
      */

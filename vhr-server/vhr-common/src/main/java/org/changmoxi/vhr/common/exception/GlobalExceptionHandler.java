@@ -2,8 +2,8 @@ package org.changmoxi.vhr.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.RespBean;
+import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.springframework.dao.DataAccessException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -101,6 +101,7 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         log.error("====================请求参数校验异常====================");
+        log.error("异常参数信息: {}", errors);
         log.error(e.getMessage(), e);
         return RespBean.error(CustomizeStatusCode.PARAMETER_ERROR, errors);
     }

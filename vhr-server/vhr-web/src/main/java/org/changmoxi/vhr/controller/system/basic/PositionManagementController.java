@@ -22,7 +22,7 @@ public class PositionManagementController {
     private PositionService positionService;
 
     /**
-     * 返回所有职位数据
+     * 获取所有职位数据
      *
      * @return
      */

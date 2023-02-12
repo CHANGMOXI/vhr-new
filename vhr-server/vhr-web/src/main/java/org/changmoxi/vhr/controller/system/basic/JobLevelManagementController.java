@@ -22,7 +22,7 @@ public class JobLevelManagementController {
     private JobLevelService jobLevelService;
 
     /**
-     * 返回所有职称数据
+     * 获取所有职称数据
      *
      * @return
      */
