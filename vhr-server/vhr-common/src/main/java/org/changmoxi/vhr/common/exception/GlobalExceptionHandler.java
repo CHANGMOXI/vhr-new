@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
@@ -87,23 +88,37 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 参数校验异常处理
+     * 请求体(RequestBody)校验异常处理
      *
      * @param e
      * @return
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public RespBean validationExceptionHandler(MethodArgumentNotValidException e) {
+    public RespBean methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        log.error("====================请求参数校验异常====================");
+        log.error("====================请求体(RequestBody)校验异常====================");
         log.error("异常参数信息: {}", errors);
         log.error(e.getMessage(), e);
         return RespBean.error(CustomizeStatusCode.PARAMETER_ERROR, errors);
+    }
+
+    /**
+     * 请求参数(PathVariable、RequestParam)校验异常处理
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public RespBean constraintViolationExceptionHandler(ConstraintViolationException e) {
+        log.error("====================请求参数(PathVariable、RequestParam)校验异常====================");
+        log.error("异常参数信息: {}", e.getMessage());
+        log.error(e.getMessage(), e);
+        return RespBean.error(CustomizeStatusCode.PARAMETER_ERROR, e.getMessage());
     }
 
     /**

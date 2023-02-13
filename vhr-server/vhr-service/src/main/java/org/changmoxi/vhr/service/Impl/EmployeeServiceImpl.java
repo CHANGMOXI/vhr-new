@@ -1,6 +1,7 @@
 package org.changmoxi.vhr.service.Impl;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
@@ -55,7 +56,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private MailProducer mailProducer;
 
     @Override
-    public List<Employee> getEmployeesByPage(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
+    public RespBean getEmployeesByPage(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
         if (ArrayUtils.isNotEmpty(employeeSearchDTO.getEmploymentDateScope()) && employeeSearchDTO.getEmploymentDateScope().length == 1) {
             if (StringUtils.equals("null", employeeSearchDTO.getEmploymentDateScope()[0])) {
                 employeeSearchDTO.setEmploymentDateScope(null);
@@ -67,7 +68,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
         PageHelper.startPage(pageNum, pageSize);
-        return employeeMapper.getEmployees(employeeSearchDTO);
+        List<Employee> employees = employeeMapper.getEmployees(employeeSearchDTO);
+        PageInfo<Employee> pageInfo = new PageInfo<>(employees);
+        return RespBean.page(CustomizeStatusCode.SUCCESS, pageInfo);
     }
 
     @Override
@@ -178,21 +181,32 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Integer getSalaryIdByDepartmentId(Integer departmentId) {
-        // TODO departmentIdToSalaryIdMap、departmentIdToParentIdMap 加入缓存，避免大量员工新增时反复查询，salary表和department表数据修改时更新缓存
+        // TODO departmentIdToSalaryIdMap 加入缓存，避免大量员工新增时反复查询，修改salary表和删除department表记录时，更新缓存
         List<Salary> salaries = salaryMapper.getAllSalaries();
         Map<Integer, Integer> departmentIdToSalaryIdMap = salaries.stream().collect(Collectors.toMap(Salary::getDepartmentId, Salary::getId));
-        List<Department> departments = departmentMapper.getAllDepartments();
-        Map<Integer, Integer> departmentIdToParentIdMap = departments.stream().collect(Collectors.toMap(Department::getId, Department::getParentId));
-        for (; ; ) {
-            if (departmentIdToSalaryIdMap.containsKey(departmentId)) {
-                return departmentIdToSalaryIdMap.get(departmentId);
-            } else {
-                departmentId = departmentIdToParentIdMap.get(departmentId);
-                if (Objects.isNull(departmentId) || departmentId <= -1) {
-                    break;
-                }
-            }
+        if (departmentIdToSalaryIdMap.containsKey(departmentId)) {
+            return departmentIdToSalaryIdMap.get(departmentId);
         }
         return null;
+    }
+
+    @Override
+    public RespBean getEmployeeSalaries(Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Employee> employeeSalaries = employeeMapper.getEmployeeSalaries();
+        PageInfo<Employee> pageInfo = new PageInfo<>(employeeSalaries);
+        return RespBean.page(CustomizeStatusCode.SUCCESS, pageInfo);
+    }
+
+    @Override
+    public RespBean updateEmployeeSalary(Integer employeeId, Integer salaryId) {
+        Integer currentSalaryId = employeeMapper.getSalaryIdById(employeeId);
+        if (salaryId.equals(currentSalaryId)) {
+            return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE);
+        }
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setSalaryId(salaryId);
+        return employeeMapper.updateByPrimaryKeySelective(employee) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
     }
 }

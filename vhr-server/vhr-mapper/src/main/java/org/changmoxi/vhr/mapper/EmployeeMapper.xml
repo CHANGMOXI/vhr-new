@@ -75,6 +75,27 @@
         <result column="deleted" property="deleted" jdbcType="BIT"/>
     </resultMap>
 
+    <resultMap id="EmployeeSalary" type="org.changmoxi.vhr.model.Employee" extends="BaseResultMap">
+        <result column="dName" property="departmentName" jdbcType="VARCHAR"/>
+        <association property="salary" javaType="org.changmoxi.vhr.model.Salary">
+            <id column="sId" property="id" jdbcType="INTEGER"/>
+            <result column="sName" property="name" jdbcType="VARCHAR"/>
+            <result column="basicSalary" property="basicSalary" jdbcType="INTEGER"/>
+            <result column="bonus" property="bonus" jdbcType="INTEGER"/>
+            <result column="lunchAllowance" property="lunchAllowance" jdbcType="INTEGER"/>
+            <result column="transportationAllowance" property="transportationAllowance" jdbcType="INTEGER"/>
+            <result column="payableSalary" property="payableSalary" jdbcType="INTEGER"/>
+            <result column="pensionBase" property="pensionBase" jdbcType="INTEGER"/>
+            <result column="pensionRatio" property="pensionRatio" jdbcType="REAL"/>
+            <result column="enableDate" property="enableDate" jdbcType="TIMESTAMP"/>
+            <result column="medicalBase" property="medicalBase" jdbcType="INTEGER"/>
+            <result column="medicalRatio" property="medicalRatio" jdbcType="REAL"/>
+            <result column="accumulationFundBase" property="accumulationFundBase" jdbcType="INTEGER"/>
+            <result column="accumulationFundRatio" property="accumulationFundRatio" jdbcType="REAL"/>
+            <result column="deleted" property="deleted" jdbcType="BIT"/>
+        </association>
+    </resultMap>
+
     <sql id="Base_Column_List">
         id
         , name, gender, birthday, idCard, wedlock, nationId, nativePlace, politicsId, email,
@@ -324,6 +345,44 @@
                  inner join position pos on e.`positionId` = pos.`id`
         where e.`id` = #{id}
           and `e`.deleted = false
+    </select>
+
+    <select id="getEmployeeSalaries" resultMap="EmployeeSalary">
+        select e.`id`,
+               e.`name`,
+               e.`workId`,
+               e.`email`,
+               e.`phone`,
+               e.`departmentId`,
+               e.`salaryId`,
+               d.`name`                    dName,
+               s.`id`                      sId,
+               s.`name`                    sName,
+               s.`basicSalary`             basicSalary,
+               s.`bonus`                   bonus,
+               s.`lunchAllowance`          lunchAllowance,
+               s.`transportationAllowance` transportationAllowance,
+               s.`payableSalary`           payableSalary,
+               s.`pensionBase`             pensionBase,
+               s.`pensionRatio`            pensionRatio,
+               s.`enableDate`              enableDate,
+               s.`medicalBase`             medicalBase,
+               s.`medicalRatio`            medicalRatio,
+               s.`accumulationFundBase`    accumulationFundBase,
+               s.`accumulationFundRatio`   accumulationFundRatio,
+               s.`deleted`                 deleted
+        from employee e
+                 left join department d on e.`departmentId` = d.`id`
+                 left join salary s on e.`salaryId` = s.`id`
+        where `e`.deleted = false
+        order by e.`id` ASC
+    </select>
+
+    <select id="getSalaryIdById" resultType="java.lang.Integer">
+        select `salaryId`
+        from employee
+        where `id` = #{id}
+          and `deleted` = false
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">

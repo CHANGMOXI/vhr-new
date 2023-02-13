@@ -23,7 +23,7 @@ public interface EmployeeService {
      * @param employeeSearchDTO
      * @return
      */
-    List<Employee> getEmployeesByPage(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO);
+    RespBean getEmployeesByPage(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO);
 
     /**
      * 添加员工
@@ -95,10 +95,28 @@ public interface EmployeeService {
     void saveImportEmployees(List<EmployeeImportDTO> importEmployees);
 
     /**
-     * 通过员工部门id获取对应的工资账套id(该部门工资账套不存在则往上级部门获取)
+     * 通过员工部门id返回对应的工资账套id(该部门工资账套不存在则返回null)
      *
      * @param departmentId
      * @return
      */
     Integer getSalaryIdByDepartmentId(Integer departmentId);
+
+    /**
+     * 分页获取所有员工账套
+     *
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    RespBean getEmployeeSalaries(Integer pageNum, Integer pageSize);
+
+    /**
+     * 更新员工工资账套
+     *
+     * @param employeeId
+     * @param salaryId
+     * @return
+     */
+    RespBean updateEmployeeSalary(Integer employeeId, Integer salaryId);
 }

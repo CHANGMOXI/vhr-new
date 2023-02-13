@@ -1,7 +1,6 @@
 package org.changmoxi.vhr.controller.emp;
 
 import com.alibaba.excel.EasyExcel;
-import com.github.pagehelper.PageInfo;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.utils.EasyExcelUtil;
@@ -42,9 +41,7 @@ public class EmployeeBasicController {
      */
     @GetMapping("/")
     public RespBean getEmployeesByPage(@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
-        List<Employee> employees = employeeService.getEmployeesByPage(pageNum, pageSize, employeeSearchDTO);
-        PageInfo<Employee> pageInfo = new PageInfo<>(employees);
-        return RespBean.page(CustomizeStatusCode.SUCCESS, pageInfo);
+        return employeeService.getEmployeesByPage(pageNum, pageSize, employeeSearchDTO);
     }
 
     /**

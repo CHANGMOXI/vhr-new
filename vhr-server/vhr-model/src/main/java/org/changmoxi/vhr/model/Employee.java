@@ -146,6 +146,11 @@ public class Employee {
 
     private Integer salaryId;
 
+    /**
+     * 扩展字段，用于分页查询员工账套
+     */
+    private Salary salary;
+
     private Boolean deleted;
 
     private static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");

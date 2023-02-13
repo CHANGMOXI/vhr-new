@@ -32,4 +32,8 @@ public interface EmployeeMapper {
     int batchInsertEmployees(List<EmployeeImportDTO> employees);
 
     Employee getEmployeeAllInfoById(Integer id);
+
+    List<Employee> getEmployeeSalaries();
+
+    Integer getSalaryIdById(Integer id);
 }
