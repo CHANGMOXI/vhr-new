@@ -113,6 +113,9 @@ public class EmployeeErrorDTO {
     private Integer seniority;
 
     @ExcelIgnore
+    private Integer salaryId;
+
+    @ExcelIgnore
     private Boolean deleted;
 
     /**

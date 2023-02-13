@@ -6,7 +6,9 @@ import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.exception.CustomizeException;
 import org.changmoxi.vhr.mapper.DepartmentMapper;
+import org.changmoxi.vhr.mapper.SalaryMapper;
 import org.changmoxi.vhr.model.Department;
+import org.changmoxi.vhr.model.Salary;
 import org.changmoxi.vhr.service.DepartmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,9 @@ import java.util.Objects;
 public class DepartmentServiceImpl implements DepartmentService {
     @Resource
     private DepartmentMapper departmentMapper;
+
+    @Resource
+    private SalaryMapper salaryMapper;
 
     @Override
     public RespBean getAllDepartments() {
@@ -112,6 +117,10 @@ public class DepartmentServiceImpl implements DepartmentService {
             }
         }
 
+        // 成功删除部门后，删除相应的工资账套
+        Salary salary = new Salary();
+        salary.setDepartmentId(id);
+        salaryMapper.logicDeleteByDepartmentId(id);
         return RespBean.ok(CustomizeStatusCode.SUCCESS_DELETE);
     }
 }

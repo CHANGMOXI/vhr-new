@@ -144,6 +144,8 @@ public class Employee {
 
     private Integer seniority;
 
+    private Integer salaryId;
+
     private Boolean deleted;
 
     private static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");

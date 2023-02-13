@@ -10,6 +10,20 @@ import java.util.Date;
 public class Salary {
     private Integer id;
 
+    @NotBlank(message = "工资账套名称不能为空")
+    @Pattern(regexp = "^\\S+(.*\\S+)*$", message = "工资账套名称不能为空且不能以空格开始或结束")
+    private String name;
+
+    @NotNull(message = "部门id不能为空")
+    @Min(value = 1, message = "部门id必须是整数，不能小于1")
+    @Digits(integer = 8, fraction = 0, message = "部门id必须是整数，上限8位")
+    private Integer departmentId;
+
+    /**
+     * 扩展字段
+     */
+    private String departmentName;
+
     @NotNull(message = "基本工资不能为空")
     @Min(value = 1, message = "基本工资必须是整数，不能小于1")
     @Digits(integer = 8, fraction = 0, message = "基本工资必须是整数，上限8位")
@@ -70,10 +84,6 @@ public class Salary {
     @DecimalMin(value = "0.01", message = "公积金比例必须是不小于0.01的小数")
     @Digits(integer = 1, fraction = 3, message = "公积金比例必须是不小于0.01且不大于1的小数，小数位上限3位")
     private Double accumulationFundRatio;
-
-    @NotBlank(message = "工资账套名称不能为空")
-    @Pattern(regexp = "^\\S+(.*\\S+)*$", message = "工资账套名称不能为空且不能以空格开始或结束")
-    private String name;
 
     private Boolean deleted;
 }

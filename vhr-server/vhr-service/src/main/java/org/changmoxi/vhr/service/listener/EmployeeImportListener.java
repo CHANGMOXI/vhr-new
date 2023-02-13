@@ -1,4 +1,4 @@
-package org.changmoxi.vhr.common.listener;
+package org.changmoxi.vhr.service.listener;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
@@ -18,7 +18,7 @@ import org.changmoxi.vhr.common.utils.SpringContextHolder;
 import org.changmoxi.vhr.dto.EmployeeErrorDTO;
 import org.changmoxi.vhr.dto.EmployeeImportDTO;
 import org.changmoxi.vhr.dto.EmployeeMailDTO;
-import org.changmoxi.vhr.mapper.EmployeeMapper;
+import org.changmoxi.vhr.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.CollectionUtils;
@@ -47,7 +47,7 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
     /**
      * Mapper或Service
      */
-    private EmployeeMapper employeeMapper;
+    private EmployeeService employeeService;
     /**
      * 用于民族、政治面貌、部门、职位、职称的name与id的映射
      */
@@ -92,11 +92,11 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
     /**
      * 读取数据而不需要收集错误数据，使用这个构造器，每次创建Listener的时候需要把Spring管理的类(比如Mapper)传进来
      *
-     * @param employeeMapper
+     * @param employeeService
      * @param allIdMaps
      */
-    public EmployeeImportListener(EmployeeMapper employeeMapper, Map<String, Map<String, Integer>> allIdMaps) {
-        this.employeeMapper = employeeMapper;
+    public EmployeeImportListener(EmployeeService employeeService, Map<String, Map<String, Integer>> allIdMaps) {
+        this.employeeService = employeeService;
         this.allIdMaps = allIdMaps;
         this.headMap = null;
         this.errorDataList = new ArrayList<>();
@@ -105,12 +105,12 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
     /**
      * 读取数据并且需要收集错误数据，使用这个构造器，每次创建Listener的时候需要把Spring管理的类(比如Mapper)传进来
      *
-     * @param employeeMapper
+     * @param employeeService
      * @param allIdMaps
      * @param errorDataFileName
      */
-    public EmployeeImportListener(EmployeeMapper employeeMapper, Map<String, Map<String, Integer>> allIdMaps, String errorDataFileName) {
-        this.employeeMapper = employeeMapper;
+    public EmployeeImportListener(EmployeeService employeeService, Map<String, Map<String, Integer>> allIdMaps, String errorDataFileName) {
+        this.employeeService = employeeService;
         this.allIdMaps = allIdMaps;
         this.errorDataFileName = errorDataFileName;
         this.headMap = null;
@@ -152,6 +152,7 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
         data.setPositionId(allIdMaps.get("positionIdMap").get(data.getPositionName()));
         data.setJobLevelId(allIdMaps.get("jobLevelIdMap").get(data.getJobLevelName()));
         data.CalculateContractTerm();
+        data.setSalaryId(employeeService.getSalaryIdByDepartmentId(data.getDepartmentId()));
         cachedDataList.add(data);
         // 达到BATCH_COUNT，需要存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
@@ -181,7 +182,7 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
     private void saveData() {
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
         try {
-            employeeMapper.batchInsertEmployees(cachedDataList);
+            employeeService.saveImportEmployees(cachedDataList);
             // 存储完成，批量发送入职欢迎邮件
             List<EmployeeMailDTO> employeeMailDTOList = new ArrayList<>();
             cachedDataList.forEach(employeeImportDTO -> {

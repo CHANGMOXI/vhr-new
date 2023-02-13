@@ -8,6 +8,7 @@ import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.exception.CustomizeException;
 import org.changmoxi.vhr.common.message.basic.MailProducer;
 import org.changmoxi.vhr.dto.EmployeeExportDTO;
+import org.changmoxi.vhr.dto.EmployeeImportDTO;
 import org.changmoxi.vhr.dto.EmployeeMailDTO;
 import org.changmoxi.vhr.dto.EmployeeSearchDTO;
 import org.changmoxi.vhr.mapper.*;
@@ -48,6 +49,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private PositionMapper positionMapper;
 
     @Resource
+    private SalaryMapper salaryMapper;
+
+    @Resource
     private MailProducer mailProducer;
 
     @Override
@@ -69,6 +73,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public RespBean addEmployee(Employee employee) {
         employee.CalculateContractTerm();
+        employee.setSalaryId(getSalaryIdByDepartmentId(employee.getDepartmentId()));
         int insertCount = employeeMapper.insertSelective(employee);
         if (insertCount == 1) {
             Employee insertEmployee = employeeMapper.getEmployeeAllInfoById(employee.getId());
@@ -164,5 +169,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         allIdMaps.put("positionIdMap", positionIdMap);
         allIdMaps.put("jobLevelIdMap", jobLevelIdMap);
         return allIdMaps;
+    }
+
+    @Override
+    public void saveImportEmployees(List<EmployeeImportDTO> importEmployees) {
+        employeeMapper.batchInsertEmployees(importEmployees);
+    }
+
+    @Override
+    public Integer getSalaryIdByDepartmentId(Integer departmentId) {
+        // TODO departmentIdToSalaryIdMap、departmentIdToParentIdMap 加入缓存，避免大量员工新增时反复查询，salary表和department表数据修改时更新缓存
+        List<Salary> salaries = salaryMapper.getAllSalaries();
+        Map<Integer, Integer> departmentIdToSalaryIdMap = salaries.stream().collect(Collectors.toMap(Salary::getDepartmentId, Salary::getId));
+        List<Department> departments = departmentMapper.getAllDepartments();
+        Map<Integer, Integer> departmentIdToParentIdMap = departments.stream().collect(Collectors.toMap(Department::getId, Department::getParentId));
+        for (; ; ) {
+            if (departmentIdToSalaryIdMap.containsKey(departmentId)) {
+                return departmentIdToSalaryIdMap.get(departmentId);
+            } else {
+                departmentId = departmentIdToParentIdMap.get(departmentId);
+                if (Objects.isNull(departmentId) || departmentId <= -1) {
+                    break;
+                }
+            }
+        }
+        return null;
     }
 }

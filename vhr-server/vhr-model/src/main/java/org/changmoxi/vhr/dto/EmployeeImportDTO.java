@@ -122,6 +122,9 @@ public class EmployeeImportDTO {
     private Integer seniority;
 
     @ExcelIgnore
+    private Integer salaryId;
+
+    @ExcelIgnore
     private Boolean deleted;
 
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");

@@ -18,4 +18,6 @@ public interface SalaryMapper {
     int updateByPrimaryKey(Salary record);
 
     List<Salary> getAllSalaries();
+
+    int logicDeleteByDepartmentId(Integer id);
 }

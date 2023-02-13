@@ -3,6 +3,8 @@
 <mapper namespace="org.changmoxi.vhr.mapper.SalaryMapper">
     <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.Salary">
         <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="departmentId" property="departmentId" jdbcType="INTEGER"/>
         <result column="basicSalary" property="basicSalary" jdbcType="INTEGER"/>
         <result column="bonus" property="bonus" jdbcType="INTEGER"/>
         <result column="lunchAllowance" property="lunchAllowance" jdbcType="INTEGER"/>
@@ -15,21 +17,47 @@
         <result column="medicalRatio" property="medicalRatio" jdbcType="REAL"/>
         <result column="accumulationFundBase" property="accumulationFundBase" jdbcType="INTEGER"/>
         <result column="accumulationFundRatio" property="accumulationFundRatio" jdbcType="REAL"/>
-        <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="deleted" property="deleted" jdbcType="BIT"/>
+    </resultMap>
+
+    <resultMap id="SalariesWithAllInfo" type="org.changmoxi.vhr.model.Salary" extends="BaseResultMap">
+        <result column="departmentName" property="departmentName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id
-        , basicSalary, bonus, lunchAllowance, transportationAllowance, payableSalary, pensionBase, pensionRatio,
-    enableDate, medicalBase, medicalRatio, accumulationFundBase, accumulationFundRatio, name, deleted
+        , name, departmentId, basicSalary, bonus, lunchAllowance, transportationAllowance, payableSalary, pensionBase, pensionRatio,
+    enableDate, medicalBase, medicalRatio, accumulationFundBase, accumulationFundRatio, deleted
     </sql>
 
-    <select id="getAllSalaries" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from salary where `deleted` = false
+    <select id="getAllSalaries" resultMap="SalariesWithAllInfo">
+        select s.`id`,
+               s.`name`,
+               s.`departmentId`,
+               d.`name` departmentName,
+               s.`basicSalary`,
+               s.`bonus`,
+               s.`lunchAllowance`,
+               s.`transportationAllowance`,
+               s.`payableSalary`,
+               s.`pensionBase`,
+               s.`pensionRatio`,
+               s.`enableDate`,
+               s.`medicalBase`,
+               s.`medicalRatio`,
+               s.`accumulationFundBase`,
+               s.`accumulationFundRatio`,
+               s.`deleted`
+        from salary s
+                 inner join department d on s.`departmentId` = d.`id`
+        where s.`deleted` = false
     </select>
+
+    <update id="logicDeleteByDepartmentId">
+        update salary
+        set `deleted` = true
+        where `departmentId` = #{id}
+    </update>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -45,18 +73,20 @@
     </delete>
 
     <insert id="insert" parameterType="org.changmoxi.vhr.model.Salary">
-        insert into salary (id, basicSalary, bonus,
+        insert into salary (id, name, departmentId, basicSalary, bonus,
                             lunchAllowance, transportationAllowance, payableSalary,
                             pensionBase, pensionRatio, enableDate,
                             medicalBase, medicalRatio, accumulationFundBase,
-                            accumulationFundRatio, name, deleted)
-        values (#{id,jdbcType=INTEGER}, #{basicSalary,jdbcType=INTEGER}, #{bonus,jdbcType=INTEGER},
+                            accumulationFundRatio, deleted)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{departmentId,jdbcType=INTEGER},
+                #{basicSalary,jdbcType=INTEGER},
+                #{bonus,jdbcType=INTEGER},
                 #{lunchAllowance,jdbcType=INTEGER}, #{transportationAllowance,jdbcType=INTEGER},
                 #{payableSalary,jdbcType=INTEGER},
                 #{pensionBase,jdbcType=INTEGER}, #{pensionRatio,jdbcType=DOUBLE}, #{enableDate,jdbcType=TIMESTAMP},
                 #{medicalBase,jdbcType=INTEGER}, #{medicalRatio,jdbcType=DOUBLE},
                 #{accumulationFundBase,jdbcType=INTEGER},
-                #{accumulationFundRatio,jdbcType=DOUBLE}, #{name,jdbcType=VARCHAR}, #{deleted,jdbcType=BIT})
+                #{accumulationFundRatio,jdbcType=DOUBLE}, #{deleted,jdbcType=BIT})
     </insert>
 
     <insert id="insertSelective" parameterType="org.changmoxi.vhr.model.Salary">
@@ -64,6 +94,12 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="departmentId != null">
+                departmentId,
             </if>
             <if test="basicSalary != null">
                 basicSalary,
@@ -101,9 +137,6 @@
             <if test="accumulationFundRatio != null">
                 accumulationFundRatio,
             </if>
-            <if test="name != null">
-                name,
-            </if>
             <if test="deleted != null">
                 deleted,
             </if>
@@ -111,6 +144,12 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="departmentId != null">
+                #{departmentId,jdbcType=INTEGER},
             </if>
             <if test="basicSalary != null">
                 #{basicSalary,jdbcType=INTEGER},
@@ -148,9 +187,6 @@
             <if test="accumulationFundRatio != null">
                 #{accumulationFundRatio,jdbcType=DOUBLE},
             </if>
-            <if test="name != null">
-                #{name,jdbcType=VARCHAR},
-            </if>
             <if test="deleted != null">
                 #{deleted,jdbcType=BIT},
             </if>
@@ -160,6 +196,12 @@
     <update id="updateByPrimaryKeySelective" parameterType="org.changmoxi.vhr.model.Salary">
         update salary
         <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="departmentId != null">
+                departmentId = #{departmentId,jdbcType=INTEGER},
+            </if>
             <if test="basicSalary != null">
                 basicSalary = #{basicSalary,jdbcType=INTEGER},
             </if>
@@ -196,9 +238,6 @@
             <if test="accumulationFundRatio != null">
                 accumulationFundRatio = #{accumulationFundRatio,jdbcType=DOUBLE},
             </if>
-            <if test="name != null">
-                name = #{name,jdbcType=VARCHAR},
-            </if>
             <if test="deleted != null">
                 deleted = #{deleted,jdbcType=BIT},
             </if>
@@ -208,7 +247,9 @@
 
     <update id="updateByPrimaryKey" parameterType="org.changmoxi.vhr.model.Salary">
         update salary
-        set basicSalary             = #{basicSalary,jdbcType=INTEGER},
+        set name                    = #{name,jdbcType=VARCHAR},
+            departmentId            = #{departmentId,jdbcType=INTEGER},
+            basicSalary             = #{basicSalary,jdbcType=INTEGER},
             bonus                   = #{bonus,jdbcType=INTEGER},
             lunchAllowance          = #{lunchAllowance,jdbcType=INTEGER},
             transportationAllowance = #{transportationAllowance,jdbcType=INTEGER},
@@ -220,7 +261,6 @@
             medicalRatio            = #{medicalRatio,jdbcType=DOUBLE},
             accumulationFundBase    = #{accumulationFundBase,jdbcType=INTEGER},
             accumulationFundRatio   = #{accumulationFundRatio,jdbcType=DOUBLE},
-            name                    = #{name,jdbcType=VARCHAR},
             deleted                 = #{deleted,jdbcType=BIT}
         where id = #{id,jdbcType=INTEGER}
     </update>

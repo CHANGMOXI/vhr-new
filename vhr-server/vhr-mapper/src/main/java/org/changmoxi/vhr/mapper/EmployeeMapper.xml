@@ -30,6 +30,7 @@
         <result column="beginContractDate" property="beginContractDate" jdbcType="DATE"/>
         <result column="endContractDate" property="endContractDate" jdbcType="DATE"/>
         <result column="seniority" property="seniority" jdbcType="INTEGER"/>
+        <result column="salaryId" property="salaryId" jdbcType="INTEGER"/>
         <result column="deleted" property="deleted" jdbcType="BIT"/>
     </resultMap>
 
@@ -70,6 +71,7 @@
         <result column="beginContractDate" property="beginContractDate" jdbcType="DATE"/>
         <result column="endContractDate" property="endContractDate" jdbcType="DATE"/>
         <result column="seniority" property="seniority" jdbcType="INTEGER"/>
+        <result column="salaryId" property="salaryId" jdbcType="INTEGER"/>
         <result column="deleted" property="deleted" jdbcType="BIT"/>
     </resultMap>
 
@@ -78,7 +80,7 @@
         , name, gender, birthday, idCard, wedlock, nationId, nativePlace, politicsId, email,
     phone, address, departmentId, jobLevelId, positionId, engageForm, highestDegree, major,
     school, employmentDate, workStatus, workId, contractTerm, conversionDate, dimissionDate,
-    beginContractDate, endContractDate, seniority, deleted
+    beginContractDate, endContractDate, seniority, salaryId, deleted
     </sql>
 
     <select id="getEmployees" resultMap="AllEmployeeInfo">
@@ -242,7 +244,7 @@
         insert into employee (name, gender, birthday, idCard, wedlock, nationId, nativePlace, politicsId,
         email, phone, address, departmentId, jobLevelId, positionId, engageForm, highestDegree, major, school,
         employmentDate, workStatus, workId, contractTerm, conversionDate, dimissionDate, beginContractDate,
-        endContractDate, seniority)
+        endContractDate, seniority, salaryId)
         values
         <foreach collection="employees" item="e" separator=",">
             (
@@ -272,7 +274,8 @@
             #{e.dimissionDate},
             #{e.beginContractDate},
             #{e.endContractDate},
-            #{e.seniority}
+            #{e.seniority},
+            #{e.salaryId}
             )
         </foreach>
     </insert>
@@ -306,6 +309,7 @@
                e.`beginContractDate`,
                e.`endContractDate`,
                e.`seniority`,
+               e.`salaryId`,
                e.`deleted`,
                n.`name`   nName,
                p.`name`   pName,
@@ -339,7 +343,7 @@
         insert into employee (id, name, gender, birthday, idCard, wedlock, nationId, nativePlace, politicsId, email,
                               phone, address, departmentId, jobLevelId, positionId, engageForm, highestDegree, major,
                               school, employmentDate, workStatus, workId, contractTerm, conversionDate, dimissionDate,
-                              beginContractDate, endContractDate, seniority, deleted)
+                              beginContractDate, endContractDate, seniority, salaryId, deleted)
         values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=CHAR},
                 #{birthday,jdbcType=DATE}, #{idCard,jdbcType=CHAR}, #{wedlock,jdbcType=CHAR},
                 #{nationId,jdbcType=INTEGER},
@@ -350,6 +354,7 @@
                 #{employmentDate,jdbcType=DATE}, #{workStatus,jdbcType=CHAR}, #{workId,jdbcType=CHAR},
                 #{contractTerm,jdbcType=DOUBLE}, #{conversionDate,jdbcType=DATE}, #{dimissionDate,jdbcType=DATE},
                 #{beginContractDate,jdbcType=DATE}, #{endContractDate,jdbcType=DATE}, #{seniority,jdbcType=INTEGER},
+                #{salaryId,jdbcType=INTEGER},
                 #{deleted,jdbcType=BIT})
     </insert>
 
@@ -450,6 +455,9 @@
             <if test="seniority != null">
                 seniority,
             </if>
+            <if test="salaryId != null">
+                salaryId,
+            </if>
             <if test="deleted != null">
                 deleted,
             </if>
@@ -538,6 +546,9 @@
             </if>
             <if test="seniority != null">
                 #{seniority,jdbcType=INTEGER},
+            </if>
+            <if test="salaryId != null">
+                #{salaryId,jdbcType=INTEGER},
             </if>
             <if test="deleted != null">
                 #{deleted,jdbcType=BIT},
@@ -629,6 +640,9 @@
             <if test="seniority != null">
                 seniority = #{seniority,jdbcType=INTEGER},
             </if>
+            <if test="salaryId != null">
+                salaryId = #{salaryId,jdbcType=INTEGER},
+            </if>
             <if test="deleted != null">
                 deleted = #{deleted,jdbcType=BIT},
             </if>
@@ -665,6 +679,7 @@
             beginContractDate = #{beginContractDate,jdbcType=DATE},
             endContractDate   = #{endContractDate,jdbcType=DATE},
             seniority         = #{seniority,jdbcType=INTEGER},
+            salaryId          = #{salaryId,jdbcType=INTEGER},
             deleted           = #{deleted,jdbcType=BIT}
         where id = #{id,jdbcType=INTEGER}
     </update>

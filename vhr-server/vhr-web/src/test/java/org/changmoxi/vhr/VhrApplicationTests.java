@@ -1,9 +1,9 @@
 package org.changmoxi.vhr;
 
 import org.changmoxi.vhr.common.info.EmployeeFixedInfo;
-import org.changmoxi.vhr.common.listener.EmployeeImportListener;
 import org.changmoxi.vhr.mapper.EmployeeMapper;
 import org.changmoxi.vhr.service.EmployeeService;
+import org.changmoxi.vhr.service.listener.EmployeeImportListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +34,7 @@ class VhrApplicationTests {
 //        String pathName = PATH + "错误员工数据导入表.xlsx";
 //        EasyExcel.read(pathName, EmployeeImportDTO.class, new EmployeeImportListener(employeeMapper, employeeService.getAllIdMaps(), fileName)).sheet().doRead();
 
-        EmployeeImportListener listener = new EmployeeImportListener(employeeMapper, employeeService.getAllIdMaps(), fileName);
+        EmployeeImportListener listener = new EmployeeImportListener(employeeService, employeeService.getAllIdMaps(), fileName);
 
         System.out.println(PATH);
         System.out.println(fixedInfo.getGenderInfo());

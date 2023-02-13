@@ -2,6 +2,7 @@ package org.changmoxi.vhr.service;
 
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.dto.EmployeeExportDTO;
+import org.changmoxi.vhr.dto.EmployeeImportDTO;
 import org.changmoxi.vhr.dto.EmployeeSearchDTO;
 import org.changmoxi.vhr.model.Employee;
 import org.changmoxi.vhr.model.Position;
@@ -85,4 +86,19 @@ public interface EmployeeService {
      * @return
      */
     Map<String, Map<String, Integer>> getAllIdMaps();
+
+    /**
+     * 导入员工数据批量入库
+     *
+     * @param importEmployees
+     */
+    void saveImportEmployees(List<EmployeeImportDTO> importEmployees);
+
+    /**
+     * 通过员工部门id获取对应的工资账套id(该部门工资账套不存在则往上级部门获取)
+     *
+     * @param departmentId
+     * @return
+     */
+    Integer getSalaryIdByDepartmentId(Integer departmentId);
 }

@@ -101,6 +101,7 @@
         select count(*)
         from employee
         where departmentId = #{id}
+          and deleted = false
     </select>
 
     <select id="getAllDepartments" resultMap="BaseResultMap">

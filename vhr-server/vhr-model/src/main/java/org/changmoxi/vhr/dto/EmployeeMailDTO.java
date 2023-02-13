@@ -82,5 +82,7 @@ public class EmployeeMailDTO implements Serializable {
 
     private Integer seniority;
 
+    private Integer salaryId;
+
     private Boolean deleted;
 }

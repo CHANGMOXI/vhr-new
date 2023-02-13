@@ -106,5 +106,8 @@ public class EmployeeExportDTO {
     private Integer seniority;
 
     @ExcelIgnore
+    private Integer salaryId;
+
+    @ExcelIgnore
     private Boolean deleted;
 }

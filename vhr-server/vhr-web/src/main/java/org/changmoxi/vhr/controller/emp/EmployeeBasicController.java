@@ -4,14 +4,13 @@ import com.alibaba.excel.EasyExcel;
 import com.github.pagehelper.PageInfo;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
+import org.changmoxi.vhr.common.utils.EasyExcelUtil;
 import org.changmoxi.vhr.dto.EmployeeExportDTO;
 import org.changmoxi.vhr.dto.EmployeeImportDTO;
 import org.changmoxi.vhr.dto.EmployeeSearchDTO;
-import org.changmoxi.vhr.common.listener.EmployeeImportListener;
-import org.changmoxi.vhr.mapper.EmployeeMapper;
 import org.changmoxi.vhr.model.Employee;
 import org.changmoxi.vhr.service.EmployeeService;
-import org.changmoxi.vhr.common.utils.EasyExcelUtil;
+import org.changmoxi.vhr.service.listener.EmployeeImportListener;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,9 +31,6 @@ import java.util.Map;
 public class EmployeeBasicController {
     @Resource
     private EmployeeService employeeService;
-
-    @Resource
-    private EmployeeMapper employeeMapper;
 
     /**
      * 分页获取员工数据（带检索）
@@ -142,7 +138,7 @@ public class EmployeeBasicController {
     @PostMapping("import")
     public RespBean importData(MultipartFile file) throws IOException {
         Map<String, Map<String, Integer>> allIdMaps = employeeService.getAllIdMaps();
-        EmployeeImportListener employeeImportListener = new EmployeeImportListener(employeeMapper, allIdMaps, file.getOriginalFilename());
+        EmployeeImportListener employeeImportListener = new EmployeeImportListener(employeeService, allIdMaps, file.getOriginalFilename());
         EasyExcel.read(file.getInputStream(), EmployeeImportDTO.class, employeeImportListener).sheet().doRead();
         if (CollectionUtils.isEmpty(employeeImportListener.getErrorDataList())) {
             return RespBean.ok("导入成功!");
