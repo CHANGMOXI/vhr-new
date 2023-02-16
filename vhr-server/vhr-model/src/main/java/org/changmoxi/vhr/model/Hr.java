@@ -33,7 +33,7 @@ public class Hr implements UserDetails {
 
     private String password;
 
-    private String userFace;
+    private String avatar;
 
     private String remark;
 
@@ -167,12 +167,12 @@ public class Hr implements UserDetails {
         this.enabled = enabled;
     }
 
-    public String getUserFace() {
-        return userFace;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setUserFace(String userFace) {
-        this.userFace = userFace;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getRemark() {

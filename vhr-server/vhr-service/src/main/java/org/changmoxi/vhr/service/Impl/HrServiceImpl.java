@@ -5,11 +5,11 @@ import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.utils.HrUtil;
 import org.changmoxi.vhr.mapper.HrMapper;
 import org.changmoxi.vhr.mapper.HrRoleMapper;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
-import org.changmoxi.vhr.common.utils.HrUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -51,8 +51,8 @@ public class HrServiceImpl implements HrService {
     }
 
     @Override
-    public RespBean getAllOtherHrs(String keywords) {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrs(HrUtil.getCurrentHr().getId(), keywords));
+    public RespBean getAllOtherHrsWithRoles(String keywords) {
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrsWithRoles(HrUtil.getCurrentHr().getId(), keywords));
     }
 
     @Override
@@ -125,5 +125,10 @@ public class HrServiceImpl implements HrService {
             throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
         }
         return hrMapper.logicDelete(id) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_DELETE) : RespBean.error(CustomizeStatusCode.ERROR_DELETE);
+    }
+
+    @Override
+    public RespBean getAllOtherHrs() {
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrs(HrUtil.getCurrentHr().getId()));
     }
 }

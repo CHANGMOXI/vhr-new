@@ -10,13 +10,13 @@
         <result column="enabled" property="enabled" jdbcType="BIT"/>
         <result column="username" property="username" jdbcType="VARCHAR"/>
         <result column="password" property="password" jdbcType="VARCHAR"/>
-        <result column="userface" property="userFace" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
         <result column="deleted" property="deleted" jdbcType="BIT"/>
     </resultMap>
 
-    <resultMap id="HrsWithRoles" type="org.changmoxi.vhr.model.Hr" extends="BaseResultMap">
+    <resultMap id="HrWithRoles" type="org.changmoxi.vhr.model.Hr" extends="BaseResultMap">
         <!--复杂属性的映射需要另外处理，集合(一对多)用collection-->
         <collection property="roles" ofType="org.changmoxi.vhr.model.Role">
             <id column="rid" property="id" jdbcType="INTEGER"/>
@@ -28,14 +28,14 @@
 
     <sql id="Base_Column_List">
         id
-        , name, phone, telephone, address, enabled, username, password, userface, remark, deleted
+        , name, phone, telephone, address, enabled, username, password, avatar, remark, deleted
     </sql>
 
-    <select id="selectByUsername" resultType="org.changmoxi.vhr.model.Hr" resultMap="BaseResultMap">
+    <select id="selectByUsername" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from hr
-        where username = #{username} and deleted = false
+        where `username` = #{username} and `deleted` = false
     </select>
 
     <select id="getHrRolesById" resultType="org.changmoxi.vhr.model.Role">
@@ -47,7 +47,7 @@
           and r.`deleted` = false
     </select>
 
-    <select id="getAllOtherHrs" resultMap="HrsWithRoles">
+    <select id="getAllOtherHrsWithRoles" resultMap="HrWithRoles">
         select hr.`id`,
         hr.`name`,
         hr.`phone`,
@@ -55,7 +55,7 @@
         hr.`address`,
         hr.`enabled`,
         hr.`username`,
-        hr.`userface`,
+        hr.`avatar`,
         hr.`remark`,
         hr.`deleted`,
         r.`id` rid,
@@ -76,6 +76,14 @@
             and ((hrr.`enabled` = true and r.`deleted` = false) or (hrr.`enabled` is null and r.`deleted` is null))
         </where>
         order by hr.`id`, r.`id`
+    </select>
+
+    <select id="getAllOtherHrs" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from hr
+        where `id` &lt;&gt; #{id} and `deleted` = false
+        order by `id`
     </select>
 
     <update id="logicDelete">
@@ -100,11 +108,11 @@
     <insert id="insert" parameterType="org.changmoxi.vhr.model.Hr">
         insert into hr (id, name, phone,
                         telephone, address, enabled,
-                        username, password, userface,
+                        username, password, avatar,
                         remark, deleted)
         values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=CHAR},
                 #{telephone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT},
-                #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{userFace,jdbcType=VARCHAR},
+                #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},
                 #{remark,jdbcType=VARCHAR}, #{deleted,jdbcType=BIT})
     </insert>
 
@@ -135,8 +143,8 @@
             <if test="password != null">
                 password,
             </if>
-            <if test="userFace != null">
-                userface,
+            <if test="avatar != null">
+                avatar,
             </if>
             <if test="remark != null">
                 remark,
@@ -170,8 +178,8 @@
             <if test="password != null">
                 #{password,jdbcType=VARCHAR},
             </if>
-            <if test="userFace != null">
-                #{userFace,jdbcType=VARCHAR},
+            <if test="avatar != null">
+                #{avatar,jdbcType=VARCHAR},
             </if>
             <if test="remark != null">
                 #{remark,jdbcType=VARCHAR},
@@ -206,8 +214,8 @@
             <if test="password != null">
                 password = #{password,jdbcType=VARCHAR},
             </if>
-            <if test="userFace != null">
-                userface = #{userFace,jdbcType=VARCHAR},
+            <if test="avatar != null">
+                avatar = #{avatar,jdbcType=VARCHAR},
             </if>
             <if test="remark != null">
                 remark = #{remark,jdbcType=VARCHAR},
@@ -228,7 +236,7 @@
             enabled   = #{enabled,jdbcType=BIT},
             username  = #{username,jdbcType=VARCHAR},
             password  = #{password,jdbcType=VARCHAR},
-            userface  = #{userFace,jdbcType=VARCHAR},
+            avatar    = #{avatar,jdbcType=VARCHAR},
             remark    = #{remark,jdbcType=VARCHAR},
             deleted   = #{deleted,jdbcType=BIT}
         where id = #{id,jdbcType=INTEGER}

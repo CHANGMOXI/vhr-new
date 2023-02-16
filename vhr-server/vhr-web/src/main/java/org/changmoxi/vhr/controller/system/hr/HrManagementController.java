@@ -22,13 +22,13 @@ public class HrManagementController {
     private RoleService roleService;
 
     /**
-     * 获取除了当前Hr操作员之外所有Hr操作员数据（带有检索）
+     * 获取除了当前Hr操作员之外所有Hr操作员数据(带有角色)（带有检索）
      *
      * @return
      */
     @GetMapping("/")
     public RespBean getAllOtherHrs(String keywords) {
-        return hrService.getAllOtherHrs(keywords);
+        return hrService.getAllOtherHrsWithRoles(keywords);
     }
 
     /**

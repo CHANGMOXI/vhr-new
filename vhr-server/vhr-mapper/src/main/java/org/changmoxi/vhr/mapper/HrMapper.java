@@ -23,7 +23,9 @@ public interface HrMapper {
 
     List<Role> getHrRolesById(Integer id);
 
-    List<Hr> getAllOtherHrs(@Param("id") Integer id, @Param("keywords") String keywords);
+    List<Hr> getAllOtherHrsWithRoles(@Param("id") Integer id, @Param("keywords") String keywords);
+
+    List<Hr> getAllOtherHrs(Integer id);
 
     int logicDelete(Integer id);
 }

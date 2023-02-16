@@ -211,7 +211,7 @@ CREATE TABLE `hr` (
   `enabled` tinyint(1) DEFAULT '1',
   `username` varchar(255) DEFAULT NULL COMMENT '用户名',
   `password` varchar(255) DEFAULT NULL COMMENT '密码',
-  `userface` varchar(255) DEFAULT NULL,
+  `avatar` varchar(255) DEFAULT NULL COMMENT '用户头像',
   `remark` varchar(255) DEFAULT NULL,
   `deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除：0 未删除，1 已删除',
   PRIMARY KEY (`id`)
@@ -219,7 +219,7 @@ CREATE TABLE `hr` (
 
 /*Data for the table `hr` */
 
-insert into `hr`(`name`,`phone`,`telephone`,`address`,`enabled`,`username`,`password`,`userface`,`remark`) values ('系统管理员','18568887789','029-82881234','深圳南山',1,'admin','$2a$10$ySG2lkvjFHY5O0./CPIE1OI8VJsuKYEzOYzqIa7AJR6sEgSzUFOAm','https://img.ixintu.com/download/jpg/201912/55995854963e8ef0b8872e49d450f11e.jpg!ys',NULL),('路飞','18568123489','029-82123434','深圳福田',1,'Luffy','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://ts1.cn.mm.bing.net/th/id/R-C.cc359ef62fd4b240fe9e97460ec8cc4b?rik=dy8TO2mn47IYbg&riu=http%3a%2f%2fpic.22520.cn%2fup%2f200315%2f1584277767783608.jpg&ehk=pMk6uBsnvVXoFYCm%2fqa035jsF88xHqfxLtOYg%2fa7hok%3d&risl=&pid=ImgRaw&r=0',NULL),('索隆','18568123666','029-82111555','广州番禺',1,'Zoro','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://inews.gtimg.com/newsapp_bt/0/12900582803/1000',NULL),('山治','18568123377','029-82111333','广州天河',1,'Sanji','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://imgsa.baidu.com/forum/pic/item/01d7af51f3deb48fc4b1d132fa1f3a292cf5782b.jpg',NULL),('甚平','18568128888','029-82111222','广州越秀',1,'Jinbe','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://p1.ssl.qhmsg.com/dr/220__/t01f175ee5bb0f367c2.png',NULL),('娜美','18568128999','029-82111111','深圳龙华',1,'Nami','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://img.wumaow.org/upload/tu/21851764.jpg',NULL);
+insert into `hr`(`name`,`phone`,`telephone`,`address`,`enabled`,`username`,`password`,`avatar`,`remark`) values ('系统管理员','18568887789','029-82881234','深圳南山',1,'admin','$2a$10$ySG2lkvjFHY5O0./CPIE1OI8VJsuKYEzOYzqIa7AJR6sEgSzUFOAm','https://img.ixintu.com/download/jpg/201912/55995854963e8ef0b8872e49d450f11e.jpg!ys',NULL),('路飞','18568123489','029-82123434','深圳福田',1,'Luffy','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://ts1.cn.mm.bing.net/th/id/R-C.cc359ef62fd4b240fe9e97460ec8cc4b?rik=dy8TO2mn47IYbg&riu=http%3a%2f%2fpic.22520.cn%2fup%2f200315%2f1584277767783608.jpg&ehk=pMk6uBsnvVXoFYCm%2fqa035jsF88xHqfxLtOYg%2fa7hok%3d&risl=&pid=ImgRaw&r=0',NULL),('索隆','18568123666','029-82111555','广州番禺',1,'Zoro','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://inews.gtimg.com/newsapp_bt/0/12900582803/1000',NULL),('山治','18568123377','029-82111333','广州天河',1,'Sanji','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://imgsa.baidu.com/forum/pic/item/01d7af51f3deb48fc4b1d132fa1f3a292cf5782b.jpg',NULL),('甚平','18568128888','029-82111222','广州越秀',1,'Jinbe','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://p1.ssl.qhmsg.com/dr/220__/t01f175ee5bb0f367c2.png',NULL),('娜美','18568128999','029-82111111','深圳龙华',1,'Nami','$2a$10$oE39aG10kB/rFu2vQeCJTu/V/v4n6DRR0f8WyXRiAYvBpmadoOBE.','https://img.wumaow.org/upload/tu/21851764.jpg',NULL);
 
 /*Table structure for table `hr_role` */
 
