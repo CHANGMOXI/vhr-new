@@ -40,10 +40,15 @@ public class UrlFilterInvocationSecurityMetadataSource implements FilterInvocati
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
+        // /verification_code开头的请求都放行，便于前端在地址加上time参数来刷新验证码
+        // 前端每次点击验证码图片，请求地址变化才会引起视图更新才能成功发起新的验证码请求
+        if (antPathMatcher.match("/verification_code*", requestUrl)) {
+            return null;
+        }
         //未登录的非法请求的第二种解决方案:
         //---> 对返回登录页面的/login请求返回null来放行，否则未登录的请求抛异常返回登录页面会陷入/login请求死循环，因为/login也被拦截
         //这里采用第三种解决方案，直接不进行重定向/login，直接返回JSON提示，所以不需要在这里放行
-//        if ("/login".equals(requestUrl)) {
+//        if (StringUtils.equals("/login", requestUrl)) {
 //            return null;
 //        }
         List<Menu> allMenusWithRoles = menuService.getAllMenusWithRoles();

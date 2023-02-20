@@ -6,7 +6,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.common.message.basic.MailProducer;
 import org.changmoxi.vhr.dto.EmployeeExportDTO;
 import org.changmoxi.vhr.dto.EmployeeImportDTO;
@@ -124,7 +124,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public RespBean updateEmployee(Employee employee) {
         if (Objects.isNull(employee.getId())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "id字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id字段不能为空");
         }
         employee.CalculateContractTerm();
         return employeeMapper.updateByPrimaryKeySelective(employee) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
@@ -133,7 +133,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeExportDTO> getExportEmployeesByPage(Integer startPage, Integer endPage, Integer pageSize) {
         if (endPage < startPage) {
-            throw new CustomizeException("请检查导出数据开始页和结束页的范围!");
+            throw new BusinessException("请检查导出数据开始页和结束页的范围!");
         }
         if (startPage < 1) {
             startPage = 1;

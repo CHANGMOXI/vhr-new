@@ -2,7 +2,7 @@ package org.changmoxi.vhr.service.Impl;
 
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.SalaryMapper;
 import org.changmoxi.vhr.model.Salary;
 import org.changmoxi.vhr.service.SalaryService;
@@ -43,7 +43,7 @@ public class SalaryServiceImpl implements SalaryService {
     @Override
     public RespBean updateSalary(Salary salary) {
         if (Objects.isNull(salary.getId())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "id字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id字段不能为空");
         }
         return salaryMapper.updateByPrimaryKeySelective(salary) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
     }

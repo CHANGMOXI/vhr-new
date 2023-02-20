@@ -2,15 +2,16 @@ package org.changmoxi.vhr.common.exception;
 
 import lombok.Getter;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
+import org.springframework.security.core.AuthenticationException;
 
 /**
- * 自定义异常类
+ * 自定义登录异常类
  *
  * @author CZS
- * @create 2023-01-07 11:36
+ * @create 2023-02-17 13:13
  **/
 @Getter
-public class CustomizeException extends RuntimeException {
+public class LoginException extends AuthenticationException {
     private Integer code;
     private String msg;
 
@@ -20,7 +21,7 @@ public class CustomizeException extends RuntimeException {
      * @param statusCode
      * @param message
      */
-    public CustomizeException(StatusCode statusCode, String message) {
+    public LoginException(StatusCode statusCode, String message) {
         //手动设置异常时设置的message，异常错误的详情
         super(message);
         //状态码
@@ -34,7 +35,7 @@ public class CustomizeException extends RuntimeException {
      *
      * @param message
      */
-    public CustomizeException(String message) {
+    public LoginException(String message) {
         //手动设置异常时设置的message，异常错误的详情
         super(message);
         //默认使用ERROR(500)状态码

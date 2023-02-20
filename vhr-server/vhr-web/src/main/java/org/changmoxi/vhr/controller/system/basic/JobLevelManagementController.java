@@ -3,7 +3,7 @@ package org.changmoxi.vhr.controller.system.basic;
 import org.apache.commons.lang3.ArrayUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.model.JobLevel;
 import org.changmoxi.vhr.service.JobLevelService;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +62,7 @@ public class JobLevelManagementController {
     @DeleteMapping("/{id}")
     public RespBean deleteJobLevel(@PathVariable Integer id) {
         if (Objects.isNull(id)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
         }
 
         Integer[] ids = new Integer[1];
@@ -79,7 +79,7 @@ public class JobLevelManagementController {
     @DeleteMapping("/")
     public RespBean batchDeleteJobLevels(Integer[] ids) {
         if (ArrayUtils.isEmpty(ids)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "ids数组不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "ids数组不能为空");
         }
 
         return jobLevelService.batchDeleteJobLevels(ids);

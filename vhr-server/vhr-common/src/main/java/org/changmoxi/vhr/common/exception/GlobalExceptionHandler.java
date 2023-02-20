@@ -80,8 +80,8 @@ public class GlobalExceptionHandler {
      * @param e
      * @return
      */
-    @ExceptionHandler(CustomizeException.class)
-    public RespBean customizeExceptionHandler(CustomizeException e) {
+    @ExceptionHandler(BusinessException.class)
+    public RespBean customizeExceptionHandler(BusinessException e) {
         log.error("====================业务异常====================");
         log.error(e.getMessage(), e);
         return RespBean.error(e.getCode(), e.getMsg());

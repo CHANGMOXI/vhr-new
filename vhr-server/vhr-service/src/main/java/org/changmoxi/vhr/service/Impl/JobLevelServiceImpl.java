@@ -3,7 +3,7 @@ package org.changmoxi.vhr.service.Impl;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.JobLevelMapper;
 import org.changmoxi.vhr.model.JobLevel;
 import org.changmoxi.vhr.service.JobLevelService;
@@ -32,10 +32,10 @@ public class JobLevelServiceImpl implements JobLevelService {
     @Override
     public RespBean addJobLevel(JobLevel jobLevel) {
         if (Objects.isNull(jobLevel) || StringUtils.isBlank(jobLevel.getName()) || StringUtils.isBlank(jobLevel.getTitleLevel())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "jobLevel传参不能为空 或 name字段或titleLevel字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "jobLevel传参不能为空 或 name字段或titleLevel字段不能为空");
         }
         if (Objects.nonNull(jobLevelMapper.getJobLevelIdByName(jobLevel.getName()))) {
-            throw new CustomizeException(CustomizeStatusCode.EXIST_SAME_JOBLEVEL, "已存在【" + jobLevel.getName() + "】职称");
+            throw new BusinessException(CustomizeStatusCode.EXIST_SAME_JOBLEVEL, "已存在【" + jobLevel.getName() + "】职称");
         }
         jobLevel.setCreateDate(new Date());
         jobLevel.setEnabled(true);
@@ -47,14 +47,14 @@ public class JobLevelServiceImpl implements JobLevelService {
     public RespBean updateJobLevel(JobLevel jobLevel) {
         if (Objects.isNull(jobLevel) || Objects.isNull(jobLevel.getId()) || StringUtils.isBlank(jobLevel.getName())
                 || StringUtils.isBlank(jobLevel.getTitleLevel()) || Objects.isNull(jobLevel.getEnabled())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "position传参不能为空 或 id、name、titleLevel、enabled字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参不能为空 或 id、name、titleLevel、enabled字段不能为空");
         }
         //name、titleLevel、enabled字段都相同就不更新
         JobLevel selectJobLevel = jobLevelMapper.selectByPrimaryKey(jobLevel.getId());
-        if (selectJobLevel.getName().equals(jobLevel.getName())
-                && selectJobLevel.getTitleLevel().equals(jobLevel.getTitleLevel())
+        if (StringUtils.equals(selectJobLevel.getName(), jobLevel.getName())
+                && StringUtils.equals(selectJobLevel.getTitleLevel(), jobLevel.getTitleLevel())
                 && selectJobLevel.getEnabled().equals(jobLevel.getEnabled())) {
-            throw new CustomizeException(CustomizeStatusCode.UPDATE_SAME_JOBLEVEL, "更新的【" + jobLevel.getName() + "】职称的name、titleLevel、enabled字段都相同");
+            throw new BusinessException(CustomizeStatusCode.UPDATE_SAME_JOBLEVEL, "更新的【" + jobLevel.getName() + "】职称的name、titleLevel、enabled字段都相同");
         }
         jobLevel.setCreateDate(null);
         jobLevel.setDeleted(null);
@@ -70,10 +70,10 @@ public class JobLevelServiceImpl implements JobLevelService {
         if (size == ids.length) {
             if (ids.length == 1) {
                 //该职称有员工(单个删除)
-                throw new CustomizeException(CustomizeStatusCode.EXIST_EMPLOYEES_WITH_THIS_JOBLEVEL, "该职称存在员工，不能删除该职称");
+                throw new BusinessException(CustomizeStatusCode.EXIST_EMPLOYEES_WITH_THIS_JOBLEVEL, "该职称存在员工，不能删除该职称");
             }
             //所有职称都有员工
-            throw new CustomizeException(CustomizeStatusCode.EXIST_EMPLOYEES_WITH_ALL_POSITIONS, "所有职称都存在员工，不能删除这些职称");
+            throw new BusinessException(CustomizeStatusCode.EXIST_EMPLOYEES_WITH_ALL_POSITIONS, "所有职称都存在员工，不能删除这些职称");
         } else if (size > 0 && size < ids.length) {
             //部分职称有员工，只删除没有员工的职称
             ids = Arrays.stream(ids).filter(id -> !existEmployeeJobLevelIdList.contains(id)).toArray(Integer[]::new);

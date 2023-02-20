@@ -1,8 +1,8 @@
 package org.changmoxi.vhr.config;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import org.changmoxi.vhr.common.RespBean;
+import org.changmoxi.vhr.common.exception.LoginException;
 import org.changmoxi.vhr.controller.LoginController;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
@@ -20,6 +20,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 
 import javax.annotation.Resource;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 /**
  * @author CZS
@@ -39,6 +40,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 提供一个 CustomizeAuthenticationProvider实例，创建该实例时，需要提供 UserDetailService 和 PasswordEncoder 实例
+     *
+     * @return
+     */
+    @Bean
+    CustomizeAuthenticationProvider customizeAuthenticationProvider() {
+        CustomizeAuthenticationProvider customizeAuthenticationProvider = new CustomizeAuthenticationProvider();
+        customizeAuthenticationProvider.setUserDetailsService(hrService);
+        customizeAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return customizeAuthenticationProvider;
+    }
+
+    /**
+     * 重写 authenticationManager方法 提供一个自己的 AuthenticationManager，实际上就是 ProviderManager
+     * 在创建 ProviderManager 时，加入自己的 CustomizeAuthenticationProvider实例
+     *
+     * @return
+     * @throws Exception
+     */
+    @Bean
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return new ProviderManager(Arrays.asList(customizeAuthenticationProvider()));
     }
 
     @Override
@@ -63,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                //所有请求都需认证后才能访问
+                //所有请求都需要认证后才能访问
                 .anyRequest().authenticated()
                 //引入自定义过滤器(动态权限)
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
@@ -119,7 +146,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter writer = response.getWriter();
                     RespBean respBean = RespBean.error("登录失败!");
-                    if (exception instanceof LockedException) {
+                    if (exception instanceof LoginException) {
+                        respBean.setMsg(((LoginException) exception).getMsg());
+                    } else if (exception instanceof LockedException) {
                         respBean.setMsg("账号被锁定，请联系管理员!");
                     } else if (exception instanceof CredentialsExpiredException) {
                         respBean.setMsg("密码过期，请联系管理员!");

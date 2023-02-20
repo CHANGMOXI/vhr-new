@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.DepartmentMapper;
 import org.changmoxi.vhr.mapper.SalaryMapper;
 import org.changmoxi.vhr.model.Department;
@@ -41,11 +41,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(rollbackFor = RuntimeException.class)
     public RespBean addDepartment(Department department) {
         if (Objects.isNull(department) || StringUtils.isBlank(department.getName()) || Objects.isNull(department.getParentId())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "department传参不能为空 或 name、parentId字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "department传参不能为空 或 name、parentId字段不能为空");
         }
         List<Integer> parentIdsList = departmentMapper.getParentIdsByName(department.getName());
         if (parentIdsList.contains(department.getParentId())) {
-            throw new CustomizeException(CustomizeStatusCode.EXIST_SAME_DEPARTMENT, "已存在同层级下的【" + department.getName() + "】部门");
+            throw new BusinessException(CustomizeStatusCode.EXIST_SAME_DEPARTMENT, "已存在同层级下的【" + department.getName() + "】部门");
         }
 
         int insertCount = departmentMapper.addDepartmentAndReturnLastInsertId(department);
@@ -84,16 +84,16 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public RespBean deleteDepartment(Integer id) {
         if (Objects.isNull(id)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
         }
 
         Department department = departmentMapper.selectByPrimaryKey(id);
         if (department.getParent()) {
-            throw new CustomizeException(CustomizeStatusCode.EXIST_SUB_DEPARTMENTS, "【" + department.getName() + "】存在子部门");
+            throw new BusinessException(CustomizeStatusCode.EXIST_SUB_DEPARTMENTS, "【" + department.getName() + "】存在子部门");
         }
         int count = departmentMapper.getEmployeeCountOfDepartment(id);
         if (count > 0) {
-            throw new CustomizeException(CustomizeStatusCode.EXIST_EMPLOYEES, "【" + department.getName() + "】存在员工");
+            throw new BusinessException(CustomizeStatusCode.EXIST_EMPLOYEES, "【" + department.getName() + "】存在员工");
         }
 
         Department deleteDepartment = new Department();

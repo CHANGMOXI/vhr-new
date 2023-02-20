@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -42,7 +43,7 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
             String needRole = configAttribute.getAttribute();
 
             //是否需要登录才能访问
-            if ("ROLE_LOGIN".equals(needRole)) {
+            if (StringUtils.equals("ROLE_LOGIN", needRole)) {
                 if (authentication instanceof AnonymousAuthenticationToken) {
                     //匿名用户，也就是未登录
                     throw new AccessDeniedException("尚未登录，请登录!");
@@ -53,7 +54,7 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
             }
 
             //判断当前用户是否具有所需的角色
-            if (authorities.stream().anyMatch(a -> a.getAuthority().equals(needRole))) {
+            if (authorities.stream().anyMatch(a -> StringUtils.equals(a.getAuthority(), needRole))) {
                 //具有所需角色，放行
                 return;
             }

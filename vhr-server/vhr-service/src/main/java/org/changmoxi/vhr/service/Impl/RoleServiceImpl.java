@@ -3,7 +3,7 @@ package org.changmoxi.vhr.service.Impl;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.RoleMapper;
 import org.changmoxi.vhr.model.Role;
 import org.changmoxi.vhr.service.RoleService;
@@ -29,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RespBean addRole(Role role) {
         if (Objects.isNull(role) || StringUtils.isBlank(role.getName()) || StringUtils.isBlank(role.getNameZh())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "角色role 或 name、nameZh字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "角色role 或 name、nameZh字段不能为空");
         }
 
         if (!StringUtils.startsWith(role.getName(), "ROLE_")) {
@@ -37,10 +37,10 @@ public class RoleServiceImpl implements RoleService {
         }
         Role selectRole = roleMapper.getRoleByName(role.getName());
         if (Objects.nonNull(selectRole)) {
-            if (selectRole.getNameZh().equals(role.getNameZh())) {
-                throw new CustomizeException(CustomizeStatusCode.EXIST_SAME_ROLE, "已存在【" + role.getNameZh() + "】角色");
+            if (StringUtils.equals(selectRole.getNameZh(), role.getNameZh())) {
+                throw new BusinessException(CustomizeStatusCode.EXIST_SAME_ROLE, "已存在【" + role.getNameZh() + "】角色");
             } else {
-                throw new CustomizeException("已存在【" + selectRole.getName() + " : " + selectRole.getNameZh() + "】角色，添加失败!");
+                throw new BusinessException("已存在【" + selectRole.getName() + " : " + selectRole.getNameZh() + "】角色，添加失败!");
             }
         }
         return roleMapper.insertSelective(role) > 0 ? RespBean.ok(CustomizeStatusCode.SUCCESS_ADD) : RespBean.error(CustomizeStatusCode.ERROR_ADD);
@@ -49,7 +49,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RespBean deleteRole(Integer rid) {
         if (Objects.isNull(rid)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "rid不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "rid不能为空");
         }
         Role role = new Role();
         role.setId(rid);

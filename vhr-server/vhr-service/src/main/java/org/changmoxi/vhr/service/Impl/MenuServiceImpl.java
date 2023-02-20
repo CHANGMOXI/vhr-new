@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.MenuMapper;
 import org.changmoxi.vhr.mapper.MenuRoleMapper;
 import org.changmoxi.vhr.model.Hr;
@@ -59,7 +59,7 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = RuntimeException.class)
     public RespBean batchEnableMenuRoles(Integer rId, Integer[] mIds) {
         if (Objects.isNull(rId)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "rId不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "rId不能为空");
         }
 
         List<Integer> allMIds = menuRoleMapper.getAllMIdsByRId(rId);

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
-import org.changmoxi.vhr.common.exception.CustomizeException;
+import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.common.utils.HrUtil;
 import org.changmoxi.vhr.mapper.HrMapper;
 import org.changmoxi.vhr.mapper.HrRoleMapper;
@@ -58,7 +58,7 @@ public class HrServiceImpl implements HrService {
     @Override
     public RespBean updateEnableStatus(Hr hr) {
         if (Objects.isNull(hr) || Objects.isNull(hr.getId())) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "hr传参不能为空 或 id、enabled字段不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "hr传参不能为空 或 id、enabled字段不能为空");
         }
 
         Hr updateHr = new Hr();
@@ -70,7 +70,7 @@ public class HrServiceImpl implements HrService {
     @Override
     public RespBean updateHrRoles(Integer hrId, Integer[] rIds) {
         if (Objects.isNull(hrId)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "hrId不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "hrId不能为空");
         }
 
         List<Integer> allRIds = hrRoleMapper.getAllRIdsByHrId(hrId);
@@ -122,7 +122,7 @@ public class HrServiceImpl implements HrService {
     @Override
     public RespBean deleteHr(Integer id) {
         if (Objects.isNull(id)) {
-            throw new CustomizeException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
         }
         return hrMapper.logicDelete(id) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_DELETE) : RespBean.error(CustomizeStatusCode.ERROR_DELETE);
     }

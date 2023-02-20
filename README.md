@@ -38,7 +38,7 @@
     - `web.ignoring().antMatchers("/login");`
   - 第二种：在动态权限的过滤器UrlFilterInvocationSecurityMetadataSource中对/login返回null来放行
     - ```java
-      if ("/login".equals(requestUrl)) {
+      if (StringUtils.equals("/login", requestUrl)) {
             return null;
       }
     - 补充：AbstractSecurityInterceptor对象的rejectPublicInvocations属性默认为false，表示返回null时，放行该请求（如果需要返回null时拒绝访问，可以在SecurityConfig的configure(HttpSecurity)方法中通过withObjectPostProcessor来设置该属性为true：`object.setRejectPublicInvocations(true);`）
@@ -118,3 +118,16 @@ ALTER TABLE `employee` AUTO_INCREMENT = 0;
     - 服务端子模块: vhr-web     依赖 vhr-service
       - 配置类、Controller、启动类
   - 邮件服务模块: mail-server 依赖vhr-model部分依赖，主要为了使用其中一些类
+
+
+### 服务端添加登录验证码
+验证码可以使用 开源验证码库kaptcha
+- 验证码库kaptcha参考: http://www.javaboy.org/2022/0511/captcha.html 、 https://juejin.cn/post/7074852077180026916 、 https://www.cnblogs.com/hackyle/p/kaptcha.html
+- 入门写法: 自定义过滤器(继承自GenericFilter或GenericFilterBean)加入验证码校验，并加入到 SpringSecurity 过滤器链
+  - 缺点: 破坏了原有过滤器链，每次请求都要走一遍验证码校验的过滤器，较为低效不太合理，实际上只需要登录请求经过验证码校验的过滤器，其他请求不需要
+  - 参考: http://www.javaboy.org/2020/0303/springsecurity-verifycode.html
+- 优雅写法一: 自定义 CustomizeAuthenticationProvider 继承自 DaoAuthenticationProvider，用来代替 DaoAuthenticationProvider，在其校验逻辑基础上加入 验证码的校验
+  - 参考: http://www.javaboy.org/2020/0503/custom-authentication.html
+  - 本项目采用这种写法，同时在UrlFilterInvocationSecurityMetadataSource中对验证码生成接口放行
+- 优雅写法二: 验证码校验也可以放在 自定义的WebAuthenticationDetails 中，同时 自定义WebAuthenticationDetailsSource，在其中构造自定义的WebAuthenticationDetails并返回
+  - 参考: http://www.javaboy.org/2020/0506/details.html
