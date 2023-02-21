@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.changmoxi.vhr.mapper.MailMessageLogMapper">
+
+    <resultMap id="BaseResultMap" type="org.changmoxi.vhr.model.MailMessageLog">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="msgId" property="msgId" jdbcType="VARCHAR"/>
+        <result column="employeeId" property="employeeId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="topic" property="topic" jdbcType="VARCHAR"/>
+        <result column="tag" property="tag" jdbcType="VARCHAR"/>
+        <result column="brokerName" property="brokerName" jdbcType="VARCHAR"/>
+        <result column="queueId" property="queueId" jdbcType="INTEGER"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="tryTime" property="tryTime" jdbcType="TIMESTAMP"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        , msgId, employeeId, status, topic, tag, brokerName, queueId, count, tryTime, createTime, updateTime
+    </sql>
+
+    <insert id="insertSelective">
+        insert into mail_send_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="msgId != null and msgId != ''">
+                msgId,
+            </if>
+            <if test="employeeId != null">
+                employeeId,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="topic != null and topic != ''">
+                topic,
+            </if>
+            <if test="tag != null and tag != ''">
+                tag,
+            </if>
+            <if test="brokerName != null and brokerName != ''">
+                brokerName,
+            </if>
+            <if test="queueId != null">
+                queueId,
+            </if>
+            <if test="count != null">
+                count,
+            </if>
+            <if test="tryTime != null">
+                tryTime,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="updateTime != null">
+                updateTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="msgId != null and msgId != ''">
+                #{msgId},
+            </if>
+            <if test="employeeId != null">
+                #{employeeId},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="topic != null and topic != ''">
+                #{topic},
+            </if>
+            <if test="tag != null and tag != ''">
+                #{tag},
+            </if>
+            <if test="brokerName != null and brokerName != ''">
+                #{brokerName},
+            </if>
+            <if test="queueId != null">
+                #{queueId},
+            </if>
+            <if test="count != null">
+                #{count},
+            </if>
+            <if test="tryTime != null">
+                #{tryTime},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsert">
+        insert into mail_send_log (msgId, employeeId, status, topic, tag, brokerName, queueId, createTime,
+        updateTime)
+        values
+        <foreach collection="mailMessageLogList" item="m" separator=",">
+            (
+            #{m.msgId},
+            #{m.employeeId},
+            #{m.status},
+            #{m.topic},
+            #{m.tag},
+            #{m.brokerName},
+            #{m.queueId},
+            #{m.createTime},
+            #{m.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectIdByEmployeeId" resultType="java.lang.Integer">
+        select `id`
+        from mail_send_log
+        where `employeeId` = #{id}
+    </select>
+
+    <update id="updateStatusById">
+        update mail_send_log
+        set status = #{status}
+        where id = #{id}
+    </update>
+</mapper>

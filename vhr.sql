@@ -430,13 +430,34 @@ CREATE TABLE `sysmsg` (
   `state` int(11) DEFAULT '0' COMMENT '0 未读 1 已读',
   PRIMARY KEY (`id`),
   KEY `hrid` (`hrid`),
-  KEY `sysmsg_ibfk_1` (`mid`),
-  CONSTRAINT `sysmsg_ibfk_1` FOREIGN KEY (`mid`) REFERENCES `msgcontent` (`id`)
+  KEY `sysmsg_ibfk_1` (`mid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Data for the table `sysmsg` */
 
 insert into `sysmsg`(`mid`,`type`,`hrid`,`state`) values (14,0,3,1),(14,0,5,1),(14,0,10,1),(14,0,11,0),(14,0,12,0),(15,0,3,1),(15,0,5,1),(15,0,10,1),(15,0,11,0),(15,0,12,0),(16,0,3,1),(16,0,5,1),(16,0,10,1),(16,0,11,0),(16,0,12,0),(17,0,3,1),(17,0,5,1),(17,0,10,1),(17,0,11,0),(17,0,12,0),(18,0,3,1),(18,0,5,0),(18,0,10,0),(18,0,11,0),(18,0,12,0);
+
+
+CREATE TABLE `mail_message_log` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `msgId` varchar(255) CHARACTER SET utf8mb4 NOT NULL COMMENT '消息Id',
+    `employeeId` int(11) DEFAULT NULL,
+     `status` int(2) DEFAULT '0' COMMENT '0发送失败，1发送成功但暂未消费，2消费成功',
+     `topic` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+     `tag` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+     `brokerName` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+     `queueId` int(11) DEFAULT NULL COMMENT '消息队列Id',
+     `count` int(3) DEFAULT NULL COMMENT '重试次数',
+     `tryTime` date DEFAULT NULL COMMENT '第一次重试时间',
+     `createTime` date DEFAULT NULL,
+     `updateTime` date DEFAULT NULL,
+     PRIMARY KEY (`id`),
+     KEY `msgId` (`msgId`),
+     KEY `employeeId` (`employeeId`),
+     KEY `status` (`status`),
+     KEY `topic` (`topic`),
+     KEY `tag` (`tag`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /* Procedure structure for procedure `addDep` */
 

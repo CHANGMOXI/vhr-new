@@ -7,11 +7,13 @@ import org.apache.rocketmq.spring.annotation.SelectorType;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.changmoxi.vhr.dto.EmployeeMailDTO;
 import org.changmoxi.vhr.dto.MailDTO;
+import org.changmoxi.vhr.mapper.MailMessageLogMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * @author CZS
@@ -25,8 +27,13 @@ public class WelcomeMailConsumer implements RocketMQListener<EmployeeMailDTO> {
     @Resource
     private MailService mailService;
 
+    @Resource
+    private MailMessageLogMapper mailMessageLogMapper;
+
     @Value("${mail-consumer-info.welcomeMailInfo.templateWelcomeMail}")
     private String templateWelcomeMail;
+
+    private static final Integer CONSUME_SUCCESS = 2;
 
     @Override
     public void onMessage(EmployeeMailDTO message) {
@@ -39,5 +46,24 @@ public class WelcomeMailConsumer implements RocketMQListener<EmployeeMailDTO> {
         context.setVariable("jobLevelName", message.getJobLevelName());
         MailDTO mailDTO = MailDTO.builder().to(message.getEmail()).subject("入职欢迎").template(templateWelcomeMail).context(context).build();
         mailService.sendHtmlTemplateMail(mailDTO);
+
+        // 消费完之后，设置消息记录的状态为消费成功
+        try {
+            for (int i = 0; i < 10; i++) {
+                Integer id = mailMessageLogMapper.selectIdByEmployeeId(message.getId());
+                if (Objects.nonNull(id)) {
+                    if (mailMessageLogMapper.updateStatusById(id, CONSUME_SUCCESS) == 1) {
+                        break;
+                    } else {
+                        // TODO 不确定这里抛异常会不会继续重试，按理说是会的
+                        throw new RuntimeException("更新消息记录的发送状态失败，稍后重试");
+                    }
+                }
+                // TODO 待完善，可以做成异步或使用其他方式，避免堵塞在这里
+                Thread.sleep(500);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

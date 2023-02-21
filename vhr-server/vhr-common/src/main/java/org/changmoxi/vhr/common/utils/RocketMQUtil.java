@@ -44,15 +44,14 @@ public class RocketMQUtil {
      * @param message     消息体
      * @return
      */
-    public boolean syncSendMessage(String destination, Object message) {
+    public SendResult syncSendMessage(String destination, Object message) {
         SendResult sendResult = rocketMQTemplate.syncSend(destination, message);
         if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
             log.info("同步发送消息成功: message = {}, sendResult = {}", message, sendResult);
-            return true;
         } else {
             log.error("同步发送消息失败: message = {}, sendResult = {}", message, sendResult);
-            return false;
         }
+        return sendResult;
     }
 
     /**
@@ -62,7 +61,7 @@ public class RocketMQUtil {
      * @param messages    消息体集合
      * @return
      */
-    public boolean syncSendBatchMessages(String destination, List<?> messages) {
+    public SendResult syncSendBatchMessages(String destination, List<?> messages) {
         List<Message<Object>> messageList = new ArrayList<>();
         for (Object message : messages) {
             messageList.add(MessageBuilder.withPayload(message).build());
@@ -70,11 +69,10 @@ public class RocketMQUtil {
         SendResult sendResult = rocketMQTemplate.syncSend(destination, messageList);
         if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
             log.info("同步发送批量消息成功: messages = {}, sendResult = {}", messages, sendResult);
-            return true;
         } else {
             log.error("同步发送批量消息失败: messages = {}, sendResult = {}", messages, sendResult);
-            return false;
         }
+        return sendResult;
     }
 
     /**
@@ -84,7 +82,7 @@ public class RocketMQUtil {
      * @param messages    消息体集合
      * @param hashKey     同一个hashKey的消息放到同一个消息队列
      */
-    public boolean syncSendMessageOrderly(String destination, List<?> messages, String hashKey) {
+    public SendResult syncSendMessageOrderly(String destination, List<?> messages, String hashKey) {
         List<Message<Object>> messageList = new ArrayList<>();
         for (Object message : messages) {
             messageList.add(MessageBuilder.withPayload(message).build());
@@ -92,11 +90,10 @@ public class RocketMQUtil {
         SendResult sendResult = rocketMQTemplate.syncSendOrderly(destination, messageList, hashKey);
         if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
             log.info("同步发送顺序消息成功: messages = {}, hashKey = {}, sendResult = {}", messages, hashKey, sendResult);
-            return true;
         } else {
             log.error("同步发送顺序消息失败: messages = {}, hashKey = {}, sendResult = {}", messages, hashKey, sendResult);
-            return false;
         }
+        return sendResult;
     }
 
     /**
@@ -108,15 +105,14 @@ public class RocketMQUtil {
      * @param delayLevel  开源版RocketMQ只支持固定的延迟级别，从 1 到 18 分别为 1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h
      * @return
      */
-    public boolean syncSendDelayMessage(String destination, Object message, long timeout, int delayLevel) {
+    public SendResult syncSendDelayMessage(String destination, Object message, long timeout, int delayLevel) {
         SendResult sendResult = rocketMQTemplate.syncSend(destination, MessageBuilder.withPayload(message).build(), timeout, delayLevel);
         if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
             log.info("同步发送延迟消息成功: message = {}, timeout = {}, delayLevel = {}, sendResult = {}", message, timeout, delayLevel, sendResult);
-            return true;
         } else {
             log.error("同步发送延迟消息失败: message = {}, timeout = {}, delayLevel = {}, sendResult = {}", message, timeout, delayLevel, sendResult);
-            return false;
         }
+        return sendResult;
     }
 
     /**
@@ -126,7 +122,6 @@ public class RocketMQUtil {
      * @param message     消息体
      */
     public void asyncSendMessage(String destination, Object message) {
-        SendResult sendResult = new SendResult();
         rocketMQTemplate.asyncSend(destination, message, new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
@@ -140,6 +135,14 @@ public class RocketMQUtil {
         });
     }
 
+    /**
+     * 异步发送延迟消息
+     *
+     * @param destination topic 或 topic:tag
+     * @param message     消息体
+     * @param timeout     超时时间
+     * @param delayLevel  开源版RocketMQ只支持固定的延迟级别，从 1 到 18 分别为 1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h
+     */
     public void asyncSendDelayMessage(String destination, Object message, long timeout, int delayLevel) {
         rocketMQTemplate.asyncSend(destination, MessageBuilder.withPayload(message).build(), new SendCallback() {
             @Override
@@ -187,14 +190,13 @@ public class RocketMQUtil {
      * @param arg         额外参数，在本地事务监听器可以获取到
      * @return
      */
-    public boolean sendMessageInTransaction(String destination, Message<?> message, Object arg) {
-        TransactionSendResult sendResult = rocketMQTemplate.sendMessageInTransaction(destination, message, arg);
-        if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
-            log.info("发送事务消息（half消息）成功: message = {}, sendResult = {}", message, sendResult);
-            return true;
+    public TransactionSendResult sendMessageInTransaction(String destination, Message<?> message, Object arg) {
+        TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(destination, message, arg);
+        if (SendStatus.SEND_OK.equals(transactionSendResult.getSendStatus())) {
+            log.info("发送事务消息（half消息）成功: message = {}, transactionSendResult = {}", message, transactionSendResult);
         } else {
-            log.error("发送事务消息（half消息）失败: message = {}, sendResult = {}", message, sendResult);
-            return false;
+            log.error("发送事务消息（half消息）失败: message = {}, transactionSendResult = {}", message, transactionSendResult);
         }
+        return transactionSendResult;
     }
 }
