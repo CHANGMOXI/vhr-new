@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.service.Impl;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
@@ -31,7 +32,7 @@ public class JobLevelServiceImpl implements JobLevelService {
 
     @Override
     public RespBean addJobLevel(JobLevel jobLevel) {
-        if (Objects.isNull(jobLevel) || StringUtils.isBlank(jobLevel.getName()) || StringUtils.isBlank(jobLevel.getTitleLevel())) {
+        if (Objects.isNull(jobLevel) || StringUtils.isAnyBlank(jobLevel.getName(), jobLevel.getTitleLevel())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "jobLevel传参不能为空 或 name字段或titleLevel字段不能为空");
         }
         if (Objects.nonNull(jobLevelMapper.getJobLevelIdByName(jobLevel.getName()))) {
@@ -45,9 +46,8 @@ public class JobLevelServiceImpl implements JobLevelService {
 
     @Override
     public RespBean updateJobLevel(JobLevel jobLevel) {
-        if (Objects.isNull(jobLevel) || Objects.isNull(jobLevel.getId()) || StringUtils.isBlank(jobLevel.getName())
-                || StringUtils.isBlank(jobLevel.getTitleLevel()) || Objects.isNull(jobLevel.getEnabled())) {
-            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参不能为空 或 id、name、titleLevel、enabled字段不能为空");
+        if (ObjectUtils.anyNull(jobLevel, jobLevel.getId(), jobLevel.getEnabled()) || StringUtils.isAnyBlank(jobLevel.getName(), jobLevel.getTitleLevel())) {
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参 或 id、name、titleLevel、enabled字段不能为空");
         }
         //name、titleLevel、enabled字段都相同就不更新
         JobLevel selectJobLevel = jobLevelMapper.selectByPrimaryKey(jobLevel.getId());

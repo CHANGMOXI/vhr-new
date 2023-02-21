@@ -1,10 +1,14 @@
 package org.changmoxi.vhr.service.Impl;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.exception.BusinessException;
+import org.changmoxi.vhr.common.info.FastDFSInfo;
+import org.changmoxi.vhr.common.utils.FastDFSUtil;
 import org.changmoxi.vhr.common.utils.HrUtil;
 import org.changmoxi.vhr.mapper.HrMapper;
 import org.changmoxi.vhr.mapper.HrRoleMapper;
@@ -12,8 +16,10 @@ import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -31,6 +37,9 @@ public class HrServiceImpl implements HrService {
 
     @Resource
     private HrRoleMapper hrRoleMapper;
+
+    @Resource
+    private FastDFSInfo fastDFSInfo;
 
     /**
      * Spring Security 根据 username 查询返回 Hr用户
@@ -57,7 +66,7 @@ public class HrServiceImpl implements HrService {
 
     @Override
     public RespBean updateEnableStatus(Hr hr) {
-        if (Objects.isNull(hr) || Objects.isNull(hr.getId())) {
+        if (ObjectUtils.anyNull(hr, hr.getId())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "hr传参不能为空 或 id、enabled字段不能为空");
         }
 
@@ -130,5 +139,71 @@ public class HrServiceImpl implements HrService {
     @Override
     public RespBean getAllOtherHrs() {
         return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrs(HrUtil.getCurrentHr().getId()));
+    }
+
+    @Override
+    public RespBean updateHrInfo(Hr hr) {
+        if (Objects.isNull(hr.getId()) || (StringUtils.isAnyBlank(hr.getName(), hr.getPhone(), hr.getTelephone(), hr.getAddress()))) {
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id、name、phone、telephone、address不能为空");
+        }
+
+        // 只涉及name、phone、telephone、address的更新
+        hr.setAvatar(null);
+        int updateCount = hrMapper.updateBasicInfo(hr);
+        if (updateCount == 1) {
+            // 动态更新当前登录用户基本信息（不涉及用户名、密码和角色），不需要让用户重新登录
+            HrUtil.updateCurrentHrBasicInfo(hr);
+            return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE);
+        }
+        return RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+    }
+
+    @Override
+    public RespBean updateHrPassword(Integer id, String oldPassword, String newPassword) {
+        if (Objects.isNull(id) || StringUtils.isAnyBlank(oldPassword, newPassword)) {
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id、oldPassword、newPassword不能为空");
+        }
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (StringUtils.equals(oldPassword, newPassword)) {
+            return RespBean.error(CustomizeStatusCode.ERROR_SAME_PASSWORD);
+        }
+        if (passwordEncoder.matches(oldPassword, HrUtil.getCurrentHr().getPassword())) {
+            // 加密新密码
+            String encodedNewPassword = passwordEncoder.encode(newPassword);
+            Hr hr = new Hr();
+            hr.setId(id);
+            hr.setPassword(encodedNewPassword);
+            int updateCount = hrMapper.updatePassword(hr);
+            return updateCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+        }
+        return RespBean.error(CustomizeStatusCode.ERROR_WRONG_OLD_PASSWORD);
+    }
+
+    @Override
+    public RespBean updateHrAvatar(Integer id, MultipartFile file) {
+        if (Objects.isNull(id) || file.isEmpty() || file.getSize() == 0) {
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id或上传文件不能为空");
+        }
+
+        String fileId = FastDFSUtil.upload(file, null);
+        if (StringUtils.isBlank(fileId)) {
+            throw new BusinessException(CustomizeStatusCode.ERROR_UPLOAD, "FastDFS上传文件失败，文件名{" + file.getOriginalFilename() + "}");
+        }
+        String avatarUrl = fastDFSInfo.getNginxHost() + fileId;
+
+        Hr hr = new Hr();
+        hr.setId(id);
+        hr.setAvatar(avatarUrl);
+        int updateCount = hrMapper.updateBasicInfo(hr);
+        if (updateCount == 1) {
+            // TODO 加入Redis后，更新头像后要更新缓存，如果访问地址准备过期，则重新获取
+            // 动态更新当前登录用户基本信息（不涉及用户名、密码和角色），不需要让用户重新登录
+            HrUtil.updateCurrentHrBasicInfo(hr);
+            // 返回文件访问地址
+            String fileAccessUrl = FastDFSUtil.getFileAccessUrl(fileId);
+            return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE, fileAccessUrl);
+        }
+        return RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
     }
 }

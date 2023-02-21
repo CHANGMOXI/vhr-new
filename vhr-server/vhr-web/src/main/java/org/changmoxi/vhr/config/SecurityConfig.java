@@ -130,11 +130,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     RespBean respBean = RespBean.ok("登录成功!", hr);
                     //写JSON字符串
                     /** Hr用户对象中的 password 不能返回给前端 **/
-                    //使用fastjson的SimplePropertyPreFilter过滤器，过滤指定属性
-                    //如果只过滤某个层级下的指定属性，使用LevelPropertyPreFilter过滤器，根据层级过滤属性(比如xxx.xxx.password)
-                    SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-                    filter.getExcludes().add("password");
-                    writer.write(JSON.toJSONString(respBean, filter));
+                    //两种办法:
+                    // ①password字段 使用@JsonIgnore，序列化和返回数据到前端时都会忽略这个字段
+                    // ②单次过滤，使用fastjson的SimplePropertyPreFilter过滤器，过滤指定属性
+                    // ---> 如果只过滤某个层级下的指定属性，使用LevelPropertyPreFilter过滤器，根据层级过滤属性(比如xxx.xxx.password)
+//                    SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+//                    filter.getExcludes().add("password");
+//                    writer.write(JSON.toJSONString(respBean, filter));
+                    writer.write(JSON.toJSONString(respBean));
                     writer.flush();
                     writer.close();
                 })

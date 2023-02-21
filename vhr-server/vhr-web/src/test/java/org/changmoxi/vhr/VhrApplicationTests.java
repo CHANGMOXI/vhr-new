@@ -4,11 +4,16 @@ import org.changmoxi.vhr.common.info.EmployeeFixedInfo;
 import org.changmoxi.vhr.mapper.EmployeeMapper;
 import org.changmoxi.vhr.service.EmployeeService;
 import org.changmoxi.vhr.service.listener.EmployeeImportListener;
+import org.csource.common.MyException;
+import org.csource.fastdfs.ProtoCommon;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 
 @SpringBootTest
 class VhrApplicationTests {
@@ -84,5 +89,17 @@ class VhrApplicationTests {
 //        long end = System.currentTimeMillis();
 //        System.out.println(end - start);
 //        System.out.println(dataList);
+    }
+
+    @Test
+    void NginxTokenTest() throws MyException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        int timestamp = (int) Instant.now().getEpochSecond();
+        String token = ProtoCommon.getToken("M00/00/00/wKiUZGPx7TKAaL9pAK_ssoWmz4E373.jpg", timestamp, "FastDFS1234567890");
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("http://192.168.148.100/")
+                .append("group1/M00/00/00/wKiUZGPx7TKAaL9pAK_ssoWmz4E373.jpg")
+                .append("?token=").append(token)
+                .append("&ts=").append(timestamp);
+        System.out.println(stringBuffer);
     }
 }

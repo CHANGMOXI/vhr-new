@@ -16,9 +16,12 @@ public enum CustomizeStatusCode implements StatusCode {
     ERROR(500),
     ERROR_UNKNOWN(500, "服务器冒烟了，请稍后再试!"),
     ERROR_VERIFICATION_CODE(500, "验证码错误!"),
+    ERROR_SAME_PASSWORD(500, "新密码与旧密码相同!"),
+    ERROR_WRONG_OLD_PASSWORD(500, "旧密码错误!"),
     ERROR_ADD(500, "添加失败!"),
     ERROR_DELETE(500, "删除失败!"),
     ERROR_UPDATE(500, "更新失败!"),
+    ERROR_UPLOAD(500, "上传失败!"),
     ERROR_EXPORT(500, "下载导出文件失败!"),
 
     PARAMETER_ERROR(5000, "传参有误或缺少必要参数!"),

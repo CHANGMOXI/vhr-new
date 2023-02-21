@@ -12,7 +12,6 @@
         <result column="password" property="password" jdbcType="VARCHAR"/>
         <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
-        <result column="remark" property="remark" jdbcType="VARCHAR"/>
         <result column="deleted" property="deleted" jdbcType="BIT"/>
     </resultMap>
 
@@ -89,6 +88,34 @@
     <update id="logicDelete">
         update hr
         set deleted = true
+        where id = #{id}
+    </update>
+
+    <update id="updateBasicInfo">
+        update hr
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="telephone != null and telephone != ''">
+                telephone = #{telephone},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        update hr
+        set `password` = #{password}
         where id = #{id}
     </update>
 

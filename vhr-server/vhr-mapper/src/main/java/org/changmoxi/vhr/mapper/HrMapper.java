@@ -28,4 +28,8 @@ public interface HrMapper {
     List<Hr> getAllOtherHrs(Integer id);
 
     int logicDelete(Integer id);
+
+    int updateBasicInfo(Hr hr);
+
+    int updatePassword(Hr hr);
 }

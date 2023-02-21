@@ -43,3 +43,9 @@ employee-fixed-info:
 mail-producer-info:
   topic: topic_mail
   tagWelcome: tag_welcome
+# nginx访问地址
+fastdfs:
+  # Nginx服务器地址
+  nginxHost: http://192.168.148.100/
+  # fastdfs-client.properties配置文件 的 fastdfs.http_secret_key
+  httpSecretKey: FastDFS1234567890

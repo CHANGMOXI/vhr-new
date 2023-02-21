@@ -31,6 +31,7 @@ public class Hr implements UserDetails {
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
     private String avatar;

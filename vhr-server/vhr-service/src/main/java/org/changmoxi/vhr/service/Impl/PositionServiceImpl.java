@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.service.Impl;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
@@ -45,8 +46,7 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public RespBean updatePosition(Position position) {
-        if (Objects.isNull(position) || Objects.isNull(position.getId())
-                || StringUtils.isBlank(position.getName()) || Objects.isNull(position.getEnabled())) {
+        if (ObjectUtils.anyNull(position, position.getId(), position.getEnabled()) || StringUtils.isBlank(position.getName())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参不能为空 或 id、name、enabled字段不能为空");
         }
         //name、enabled字段都相同就不更新

@@ -3,6 +3,7 @@ package org.changmoxi.vhr.service;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.model.Hr;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author CZS
@@ -47,4 +48,31 @@ public interface HrService extends UserDetailsService {
      * @return
      */
     RespBean getAllOtherHrs();
+
+    /**
+     * 更新用户信息
+     *
+     * @param hr
+     * @return
+     */
+    RespBean updateHrInfo(Hr hr);
+
+    /**
+     * 修改用户密码
+     *
+     * @param id
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    RespBean updateHrPassword(Integer id, String oldPassword, String newPassword);
+
+    /**
+     * 更新用户头像
+     *
+     * @param id
+     * @param file
+     * @return
+     */
+    RespBean updateHrAvatar(Integer id, MultipartFile file);
 }

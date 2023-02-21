@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.service.Impl;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
@@ -40,8 +41,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public RespBean addDepartment(Department department) {
-        if (Objects.isNull(department) || StringUtils.isBlank(department.getName()) || Objects.isNull(department.getParentId())) {
-            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "department传参不能为空 或 name、parentId字段不能为空");
+        if (ObjectUtils.anyNull(department, department.getParentId()) || StringUtils.isBlank(department.getName())) {
+            throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "department传参 或 name、parentId字段不能为空");
         }
         List<Integer> parentIdsList = departmentMapper.getParentIdsByName(department.getName());
         if (parentIdsList.contains(department.getParentId())) {

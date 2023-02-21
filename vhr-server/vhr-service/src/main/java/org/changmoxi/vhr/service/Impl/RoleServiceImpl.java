@@ -28,7 +28,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RespBean addRole(Role role) {
-        if (Objects.isNull(role) || StringUtils.isBlank(role.getName()) || StringUtils.isBlank(role.getNameZh())) {
+        if (Objects.isNull(role) || StringUtils.isAnyBlank(role.getName(), role.getNameZh())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "角色role 或 name、nameZh字段不能为空");
         }
 

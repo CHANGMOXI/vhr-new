@@ -40,7 +40,7 @@ public class CustomizeAuthenticationProvider extends DaoAuthenticationProvider {
         //从 session 中获取服务端生成的验证码文本
         String verificationCode = (String) request.getSession().getAttribute("verification_code");
         // 验证码校验
-        if (StringUtils.isBlank(code) || StringUtils.isBlank(verificationCode) || !StringUtils.equals(code.toLowerCase(), verificationCode.toLowerCase())) {
+        if (StringUtils.isAnyBlank(code, verificationCode) || !StringUtils.equals(code.toLowerCase(), verificationCode.toLowerCase())) {
             throw new LoginException(CustomizeStatusCode.ERROR_VERIFICATION_CODE, "验证码错误!");
         }
 
