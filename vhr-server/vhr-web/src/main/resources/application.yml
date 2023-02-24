@@ -7,6 +7,17 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     username: root
     password: 123456
+  redis:
+    host: 43.138.236.83
+    port: 6666
+    database: 0
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
 
 #开启mybatis日志，能看到SQL语句
 mybatis:
