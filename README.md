@@ -131,3 +131,12 @@ ALTER TABLE `employee` AUTO_INCREMENT = 0;
   - 本项目采用这种写法，同时在UrlFilterInvocationSecurityMetadataSource中对验证码生成接口放行
 - 优雅写法二: 验证码校验也可以放在 自定义的WebAuthenticationDetails 中，同时 自定义WebAuthenticationDetailsSource，在其中构造自定义的WebAuthenticationDetails并返回
   - 参考: http://www.javaboy.org/2020/0506/details.html
+
+
+### 基于JSR107缓存规范，扩展Spring的Cache相关接口，集成Caffeine+Redis两级缓存
+参考: https://juejin.cn/post/7117497031714865159
+- `自定义缓存组件DoubleCache`，**继承于**对Spring的Cache接口进行了一层封装的**抽象类AbstractValueAdaptingCache**，整合 Caffeine的Cache 和 RedisTemplate 并且自定义缓存操作逻辑。
+- `自定义缓存管理器DoubleCacheManager`，**实现CacheManager接口**，管理自定义缓存组件DoubleCache作为Spring中的缓存来使用，内部使用ConcurrentHashMap维护一组不同cacheName的DoubleCache。
+- `自定义缓存配置信息`，一方面用于在DoubleCacheManager中新建DoubleCache时初始化Caffeine的Cache，另一方面用于在DoubleCache中写入Redis缓存时设置配置信息中的默认过期时间或自定义过期时间。
+- 在CacheConfig中`配置自定义的DoubleCacheManager作为默认的缓存管理器`。
+- `启动类加上@EnableCaching注解`，**开启基于注解的缓存**，这样就可以使用@Cacheable、@CachePut、@CacheEvict、@Caching等相关注解操作两级缓存，同时能使用自带的SpringEl表达式解析功能。
