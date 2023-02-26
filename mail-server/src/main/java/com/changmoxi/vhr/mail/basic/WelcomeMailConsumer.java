@@ -37,7 +37,7 @@ public class WelcomeMailConsumer implements RocketMQListener<EmployeeMailDTO> {
 
     @Override
     public void onMessage(EmployeeMailDTO message) {
-        // TODO 消费者无法避免消息重复，需要业务服务来保证消息消费 幂等
+        // TODO 消费者无法避免消息重复，需要业务服务来保证消息消费 幂等，另外完成消费业务之后修改消息记录状态抛异常也会导致重试消费，同样需要 幂等
         log.info("WelcomeMailConsumer 接收到消息: {}", message);
         Context context = new Context();
         context.setVariable("name", message.getName());

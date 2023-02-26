@@ -47,6 +47,7 @@ pagehelper:
 
 rocketmq:
   name-server: 43.138.236.83:9876
+  #  name-server: 192.168.148.100:9876
   producer:
     group: pg_vhr
 
