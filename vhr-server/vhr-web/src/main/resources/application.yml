@@ -19,6 +19,20 @@ spring:
         max-idle: 8
         min-idle: 0
 
+doublecache:
+  allowNullValues: true
+  initialCapacity: 128
+  maximumSize: 1024
+  # Caffeine过期时间
+  expireAfterWrite: 60
+  # Redis缓存默认过期时间
+  redisExpire: 120
+  # Redis缓存默认过期时间为redisExpire，也可以自定义部分key的过期时间(单位: 秒)
+  # 数据结构 Map<String, Map<String,Long>>，以@Cacheable注解为例: 第一个String对应注解的cacheNames也就是DoubleCache的cacheName，第二个Map的String对应注解的key
+  customizeRedisExpire:
+    menu:
+      menus.with.roles: 300
+
 #开启mybatis日志，能看到SQL语句
 mybatis:
   configuration:
