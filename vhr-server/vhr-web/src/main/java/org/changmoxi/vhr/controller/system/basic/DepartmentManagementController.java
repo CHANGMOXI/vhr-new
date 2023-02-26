@@ -1,6 +1,7 @@
 package org.changmoxi.vhr.controller.system.basic;
 
 import org.changmoxi.vhr.common.RespBean;
+import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.Department;
 import org.changmoxi.vhr.service.DepartmentService;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class DepartmentManagementController {
      */
     @GetMapping("/")
     public RespBean getAllDepartments() {
-        return departmentService.getAllDepartments();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, departmentService.getAllDepartments());
     }
 
     /**

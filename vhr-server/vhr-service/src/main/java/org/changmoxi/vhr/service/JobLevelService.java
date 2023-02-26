@@ -3,6 +3,8 @@ package org.changmoxi.vhr.service;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.model.JobLevel;
 
+import java.util.List;
+
 /**
  * @author CZS
  * @create 2023-01-08 17:12
@@ -13,7 +15,7 @@ public interface JobLevelService {
      *
      * @return
      */
-    RespBean getAllJobLevels();
+    List<JobLevel> getAllJobLevels();
 
     /**
      * 添加职称数据

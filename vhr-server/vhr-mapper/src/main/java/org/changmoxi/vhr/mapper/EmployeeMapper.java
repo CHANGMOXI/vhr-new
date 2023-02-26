@@ -36,4 +36,6 @@ public interface EmployeeMapper {
     List<Employee> getEmployeeSalaries();
 
     Integer getSalaryIdById(Integer id);
+
+    Integer getCountLessThanId(Integer id);
 }

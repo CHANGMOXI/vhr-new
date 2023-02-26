@@ -1,6 +1,9 @@
 package org.changmoxi.vhr.dto;
 
 import lombok.Data;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author CZS
@@ -25,4 +28,12 @@ public class EmployeeSearchDTO {
     private String[] employmentDateScope;
 
     private String workStatus;
+
+    public boolean isAllNull() {
+        if (ObjectUtils.allNull(nationId, politicsId, departmentId, positionId, jobLevelId)
+                && StringUtils.isAllBlank(name, engageForm, workStatus) && ArrayUtils.isEmpty(employmentDateScope)) {
+            return true;
+        }
+        return false;
+    }
 }

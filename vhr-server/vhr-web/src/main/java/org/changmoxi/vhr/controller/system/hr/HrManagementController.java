@@ -1,6 +1,8 @@
 package org.changmoxi.vhr.controller.system.hr;
 
+import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
+import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
 import org.changmoxi.vhr.service.RoleService;
@@ -28,7 +30,7 @@ public class HrManagementController {
      */
     @GetMapping("/")
     public RespBean getAllOtherHrs(String keywords) {
-        return hrService.getAllOtherHrsWithRoles(keywords);
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, StringUtils.isBlank(keywords) ? hrService.getAllOtherHrsWithRoles() : hrService.getAllOtherHrsWithRolesBySearch(keywords));
     }
 
     /**
@@ -49,7 +51,7 @@ public class HrManagementController {
      */
     @GetMapping("/roles")
     public RespBean getAllRoles() {
-        return roleService.getAllRoles();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, roleService.getAllRoles());
     }
 
     /**

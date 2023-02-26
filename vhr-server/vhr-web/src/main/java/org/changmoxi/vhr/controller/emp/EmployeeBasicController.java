@@ -1,6 +1,7 @@
 package org.changmoxi.vhr.controller.emp;
 
 import com.alibaba.excel.EasyExcel;
+import com.github.pagehelper.PageInfo;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.common.utils.EasyExcelUtil;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author CZS
@@ -31,6 +33,8 @@ public class EmployeeBasicController {
     @Resource
     private EmployeeService employeeService;
 
+    private static final Integer[] PAGE_SIZES = new Integer[]{10, 20, 30, 40, 50, 100};
+
     /**
      * 分页获取员工数据（带检索）
      *
@@ -41,7 +45,10 @@ public class EmployeeBasicController {
      */
     @GetMapping("/")
     public RespBean getEmployeesByPage(@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
-        return employeeService.getEmployeesByPage(pageNum, pageSize, employeeSearchDTO);
+        PageInfo<Employee> pageInfo = Objects.isNull(employeeSearchDTO) || employeeSearchDTO.isAllNull() ?
+                employeeService.getEmployeesByPage(pageNum, pageSize) :
+                employeeService.getEmployeesByPageAndSearch(pageNum, pageSize, employeeSearchDTO);
+        return RespBean.page(CustomizeStatusCode.SUCCESS, pageInfo);
     }
 
     /**
@@ -52,7 +59,20 @@ public class EmployeeBasicController {
      */
     @PostMapping("/")
     public RespBean addEmployee(@RequestBody @Valid Employee employee) {
-        return employeeService.addEmployee(employee);
+        Map<Integer, Integer> departmentIdToSalaryIdMap = employeeService.getDepartmentIdToSalaryIdMap();
+        if (departmentIdToSalaryIdMap.containsKey(employee.getDepartmentId())) {
+            employee.setSalaryId(departmentIdToSalaryIdMap.get(employee.getDepartmentId()));
+        }
+        int insertCount = employeeService.addEmployee(employee);
+        if (insertCount == 1) {
+            // 计算员工的分页位置，删除相应的分页缓存
+            Integer count = employeeService.getCountLessThanId(employee.getId());
+            for (Integer pageSize : PAGE_SIZES) {
+                Integer pageNum = count / pageSize + 1;
+                employeeService.deleteEmployeesPageCache(pageNum, pageSize);
+            }
+        }
+        return insertCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_ADD) : RespBean.error(CustomizeStatusCode.ERROR_ADD);
     }
 
     /**
@@ -93,7 +113,12 @@ public class EmployeeBasicController {
      */
     @DeleteMapping("/{id}")
     public RespBean deleteEmployee(@PathVariable Integer id) {
-        return employeeService.deleteEmployee(id);
+        int deleteCount = employeeService.deleteEmployee(id);
+        if (deleteCount == 1) {
+            // 删除员工后，该员工后面的所有员工涉及的分页缓存都应该删除，因此直接清空所有分页缓存
+            employeeService.clearAllPageCache();
+        }
+        return deleteCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_DELETE) : RespBean.error(CustomizeStatusCode.ERROR_DELETE);
     }
 
     /**
@@ -104,7 +129,16 @@ public class EmployeeBasicController {
      */
     @PutMapping("/")
     public RespBean updateEmployee(@RequestBody @Valid Employee employee) {
-        return employeeService.updateEmployee(employee);
+        int updateCount = employeeService.updateEmployee(employee);
+        if (updateCount == 1) {
+            // 计算员工的分页位置，删除相应的分页缓存
+            Integer count = employeeService.getCountLessThanId(employee.getId());
+            for (Integer pageSize : PAGE_SIZES) {
+                Integer pageNum = count / pageSize + 1;
+                employeeService.deleteEmployeesPageCache(pageNum, pageSize);
+            }
+        }
+        return updateCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
     }
 
     /**

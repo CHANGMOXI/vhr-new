@@ -152,7 +152,10 @@ public class EmployeeImportListener extends AnalysisEventListener<EmployeeImport
         data.setPositionId(allIdMaps.get("positionIdMap").get(data.getPositionName()));
         data.setJobLevelId(allIdMaps.get("jobLevelIdMap").get(data.getJobLevelName()));
         data.CalculateContractTerm();
-        data.setSalaryId(employeeService.getSalaryIdByDepartmentId(data.getDepartmentId()));
+        Map<Integer, Integer> departmentIdToSalaryIdMap = employeeService.getDepartmentIdToSalaryIdMap();
+        if (departmentIdToSalaryIdMap.containsKey(data.getDepartmentId())) {
+            data.setSalaryId(departmentIdToSalaryIdMap.get(data.getDepartmentId()));
+        }
         cachedDataList.add(data);
         // 达到BATCH_COUNT，需要存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {

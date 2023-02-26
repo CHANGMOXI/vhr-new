@@ -147,32 +147,35 @@
         inner join position pos on e.`positionId` = pos.`id`
         <where>
             and e.`deleted` = false
-            <if test="search.name != null and search.name != ''">
-                and e.`name` like CONCAT('%',#{search.name},'%')
-            </if>
-            <if test="search.nationId != null">
-                and e.`nationId` = #{search.nationId}
-            </if>
-            <if test="search.politicsId != null">
-                and e.`politicsId` = #{search.politicsId}
-            </if>
-            <if test="search.departmentId != null">
-                and e.`departmentId` = #{search.departmentId}
-            </if>
-            <if test="search.jobLevelId != null">
-                and e.`jobLevelId` = #{search.jobLevelId}
-            </if>
-            <if test="search.positionId != null">
-                and e.`positionId` = #{search.positionId}
-            </if>
-            <if test="search.engageForm != null and search.engageForm != ''">
-                and e.`engageForm` = #{search.engageForm}
-            </if>
-            <if test="search.employmentDateScope != null and search.employmentDateScope.length > 0">
-                and (e.`employmentDate` between #{search.employmentDateScope[0]} and #{search.employmentDateScope[1]})
-            </if>
-            <if test="search.workStatus != null and search.workStatus != ''">
-                and e.`workStatus` = #{search.workStatus}
+            <if test="search != null">
+                <if test="search.name != null and search.name != ''">
+                    and e.`name` like CONCAT('%',#{search.name},'%')
+                </if>
+                <if test="search.nationId != null">
+                    and e.`nationId` = #{search.nationId}
+                </if>
+                <if test="search.politicsId != null">
+                    and e.`politicsId` = #{search.politicsId}
+                </if>
+                <if test="search.departmentId != null">
+                    and e.`departmentId` = #{search.departmentId}
+                </if>
+                <if test="search.jobLevelId != null">
+                    and e.`jobLevelId` = #{search.jobLevelId}
+                </if>
+                <if test="search.positionId != null">
+                    and e.`positionId` = #{search.positionId}
+                </if>
+                <if test="search.engageForm != null and search.engageForm != ''">
+                    and e.`engageForm` = #{search.engageForm}
+                </if>
+                <if test="search.employmentDateScope != null and search.employmentDateScope.length > 0">
+                    and (e.`employmentDate` between #{search.employmentDateScope[0]} and
+                    #{search.employmentDateScope[1]})
+                </if>
+                <if test="search.workStatus != null and search.workStatus != ''">
+                    and e.`workStatus` = #{search.workStatus}
+                </if>
             </if>
         </where>
         order by e.`id` ASC
@@ -374,7 +377,7 @@
         from employee e
                  left join department d on e.`departmentId` = d.`id`
                  left join salary s on e.`salaryId` = s.`id`
-        where `e`.deleted = false
+        where e.`deleted` = false
         order by e.`id` ASC
     </select>
 
@@ -382,6 +385,13 @@
         select `salaryId`
         from employee
         where `id` = #{id}
+          and `deleted` = false
+    </select>
+
+    <select id="getCountLessThanId" resultType="java.lang.Integer">
+        select count(`id`)
+        from employee
+        where `id` &lt; #{id}
           and `deleted` = false
     </select>
 

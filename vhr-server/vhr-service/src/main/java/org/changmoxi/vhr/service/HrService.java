@@ -5,17 +5,26 @@ import org.changmoxi.vhr.model.Hr;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @author CZS
  * @create 2023-01-02 15:10
  **/
 public interface HrService extends UserDetailsService {
     /**
+     * 获取除了当前Hr之外所有Hr(操作员)数据(带有角色)
+     *
+     * @return
+     */
+    List<Hr> getAllOtherHrsWithRoles();
+
+    /**
      * 获取除了当前Hr之外所有Hr(操作员)数据(带有角色)（带有检索）
      *
      * @return
      */
-    RespBean getAllOtherHrsWithRoles(String keywords);
+    List<Hr> getAllOtherHrsWithRolesBySearch(String keywords);
 
     /**
      * 更新Hr(操作员)的用户状态

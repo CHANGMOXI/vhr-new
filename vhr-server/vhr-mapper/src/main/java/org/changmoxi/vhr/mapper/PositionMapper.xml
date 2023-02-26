@@ -39,6 +39,7 @@
                     #{id}
                 </if>
             </foreach>
+            and e.`deleted` = false
         </where>
         group by p.`id`
     </select>

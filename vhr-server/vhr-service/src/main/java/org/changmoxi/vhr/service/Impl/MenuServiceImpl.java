@@ -1,5 +1,6 @@
 package org.changmoxi.vhr.service.Impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.changmoxi.vhr.common.RespBean;
@@ -10,6 +11,8 @@ import org.changmoxi.vhr.mapper.MenuRoleMapper;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.model.Menu;
 import org.changmoxi.vhr.service.MenuService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import java.util.Objects;
  * @author CZS
  * @create 2023-01-03 22:29
  **/
+@Slf4j
 @Service
 public class MenuServiceImpl implements MenuService {
     @Resource
@@ -33,30 +37,32 @@ public class MenuServiceImpl implements MenuService {
     private MenuRoleMapper menuRoleMapper;
 
     @Override
-//    @Cacheable//TODO 菜单项数据很少变化，每次请求都查询数据库不太合理，可以加入缓存Spring Cache 或 Redis，另外在修改角色的菜单权限之后应该在Redis中更新用户可操作的菜单项
     public RespBean getMenusByHrId() {
         Integer id = ((Hr) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return RespBean.ok(CustomizeStatusCode.SUCCESS, menuMapper.getMenusByHrId(id));
     }
 
     @Override
-//    @Cacheable//TODO 菜单项数据很少变化，每次请求都查询数据库不太合理，可以加入缓存Spring Cache 或 Redis
+    @Cacheable(cacheNames = "menu", key = "'menus.with.roles'")
     public List<Menu> getAllMenusWithRoles() {
         return menuMapper.getAllMenusWithRoles();
     }
 
     @Override
-    public RespBean getAllMenus() {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuMapper.getAllMenus());
+    @Cacheable(cacheNames = "menu", key = "'all.enabled.menus'")
+    public List<Menu> getAllMenus() {
+        return menuMapper.getAllMenus();
     }
 
     @Override
-    public RespBean getEnabledMIdsByRId(Integer rId) {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuRoleMapper.getEnabledMidsByRid(rId));
+    @Cacheable(cacheNames = "menu", key = "'enabled.mids.by.rid.' + #rId")
+    public List<Integer> getEnabledMIdsByRId(Integer rId) {
+        return menuRoleMapper.getEnabledMidsByRid(rId);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
+    @CacheEvict(cacheNames = "menu", key = "'enabled.mids.by.rid.' + #rId")
     public RespBean batchEnableMenuRoles(Integer rId, Integer[] mIds) {
         if (Objects.isNull(rId)) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "rId不能为空");

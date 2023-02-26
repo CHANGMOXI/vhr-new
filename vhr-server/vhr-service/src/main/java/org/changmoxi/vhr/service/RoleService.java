@@ -3,6 +3,8 @@ package org.changmoxi.vhr.service;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.model.Role;
 
+import java.util.List;
+
 /**
  * @author CZS
  * @create 2023-01-10 11:15
@@ -13,7 +15,7 @@ public interface RoleService {
      *
      * @return
      */
-    RespBean getAllRoles();
+    List<Role> getAllRoles();
 
     /**
      * 添加角色

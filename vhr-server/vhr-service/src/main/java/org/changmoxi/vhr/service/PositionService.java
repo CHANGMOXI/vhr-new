@@ -3,6 +3,8 @@ package org.changmoxi.vhr.service;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.model.Position;
 
+import java.util.List;
+
 /**
  * @author CZS
  * @create 2023-01-06 16:42
@@ -13,7 +15,7 @@ public interface PositionService {
      *
      * @return
      */
-    RespBean getAllPositions();
+    List<Position> getAllPositions();
 
     /**
      * 添加职位数据

@@ -18,7 +18,7 @@
     </properties>
 
     <dependencies>
-        <!--依赖vhr-model，为了方便使用一些类，所以有些依赖不需要-->
+        <!--依赖vhr-mapper，为了方便使用一些类，所以有些依赖不需要-->
         <dependency>
             <groupId>org.changmoxi</groupId>
             <artifactId>vhr-mapper</artifactId>

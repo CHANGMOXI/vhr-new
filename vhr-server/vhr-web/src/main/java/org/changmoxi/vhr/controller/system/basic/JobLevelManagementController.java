@@ -28,7 +28,7 @@ public class JobLevelManagementController {
      */
     @GetMapping("/")
     public RespBean getAllJobLevels() {
-        return jobLevelService.getAllJobLevels();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, jobLevelService.getAllJobLevels());
     }
 
     /**

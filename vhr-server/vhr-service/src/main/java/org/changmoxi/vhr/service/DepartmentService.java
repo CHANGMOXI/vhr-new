@@ -3,6 +3,8 @@ package org.changmoxi.vhr.service;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.model.Department;
 
+import java.util.List;
+
 /**
  * @author CZS
  * @create 2023-01-13 16:25
@@ -13,7 +15,7 @@ public interface DepartmentService {
      *
      * @return
      */
-    RespBean getAllDepartments();
+    List<Department> getAllDepartments();
 
     /**
      * 添加部门

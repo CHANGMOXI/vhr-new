@@ -3,6 +3,8 @@ package org.changmoxi.vhr.service;
 import org.changmoxi.vhr.common.RespBean;
 import org.changmoxi.vhr.model.Salary;
 
+import java.util.List;
+
 /**
  * @author CZS
  * @create 2023-02-11 0:57
@@ -13,7 +15,7 @@ public interface SalaryService {
      *
      * @return
      */
-    RespBean getAllSalaries();
+    List<Salary> getAllSalaries();
 
     /**
      * 添加账套

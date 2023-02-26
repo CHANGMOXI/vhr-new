@@ -8,6 +8,9 @@ import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.PositionMapper;
 import org.changmoxi.vhr.model.Position;
 import org.changmoxi.vhr.service.PositionService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,11 +29,14 @@ public class PositionServiceImpl implements PositionService {
     private PositionMapper positionMapper;
 
     @Override
-    public RespBean getAllPositions() {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, positionMapper.getAllPositions());
+    @Cacheable(cacheNames = "position", key = "'all.positions'")
+    public List<Position> getAllPositions() {
+        return positionMapper.getAllPositions();
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "position", key = "'all.positions'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean addPosition(Position position) {
         if (Objects.isNull(position) || StringUtils.isBlank(position.getName())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参不能为空 或 name字段不能为空");
@@ -45,6 +51,8 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "position", key = "'all.positions'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean updatePosition(Position position) {
         if (ObjectUtils.anyNull(position, position.getId(), position.getEnabled()) || StringUtils.isBlank(position.getName())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参不能为空 或 id、name、enabled字段不能为空");
@@ -61,8 +69,9 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "position", key = "'all.positions'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean batchDeletePositions(Integer[] ids) {
-        //TODO 查询方法可能还需要考虑到以后可能会给employee表添加的deleted字段
         List<Integer> existEmployeePositionIdList = positionMapper.getExistEmployeePositionIdsByIds(ids);
         int size = existEmployeePositionIdList.size();
         if (size == ids.length) {

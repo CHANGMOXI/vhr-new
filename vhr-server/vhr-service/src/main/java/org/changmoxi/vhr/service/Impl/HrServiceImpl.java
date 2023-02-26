@@ -14,6 +14,8 @@ import org.changmoxi.vhr.mapper.HrMapper;
 import org.changmoxi.vhr.mapper.HrRoleMapper;
 import org.changmoxi.vhr.model.Hr;
 import org.changmoxi.vhr.service.HrService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -60,11 +62,18 @@ public class HrServiceImpl implements HrService {
     }
 
     @Override
-    public RespBean getAllOtherHrsWithRoles(String keywords) {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, hrMapper.getAllOtherHrsWithRoles(HrUtil.getCurrentHr().getId(), keywords));
+    @Cacheable(cacheNames = "hr", key = "'all.other.hrs.with.roles'")
+    public List<Hr> getAllOtherHrsWithRoles() {
+        return hrMapper.getAllOtherHrsWithRoles(HrUtil.getCurrentHr().getId(), null);
     }
 
     @Override
+    public List<Hr> getAllOtherHrsWithRolesBySearch(String keywords) {
+        return hrMapper.getAllOtherHrsWithRoles(HrUtil.getCurrentHr().getId(), keywords);
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "hr", key = "'all.other.hrs.with.roles'")
     public RespBean updateEnableStatus(Hr hr) {
         if (ObjectUtils.anyNull(hr, hr.getId())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "hr传参不能为空 或 id、enabled字段不能为空");
@@ -77,6 +86,7 @@ public class HrServiceImpl implements HrService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "hr", key = "'all.other.hrs.with.roles'")
     public RespBean updateHrRoles(Integer hrId, Integer[] rIds) {
         if (Objects.isNull(hrId)) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "hrId不能为空");
@@ -129,6 +139,7 @@ public class HrServiceImpl implements HrService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "hr", key = "'all.other.hrs.with.roles'")
     public RespBean deleteHr(Integer id) {
         if (Objects.isNull(id)) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
@@ -197,7 +208,7 @@ public class HrServiceImpl implements HrService {
         hr.setAvatar(avatarUrl);
         int updateCount = hrMapper.updateBasicInfo(hr);
         if (updateCount == 1) {
-            // TODO 加入Redis后，更新头像后要更新缓存，如果访问地址准备过期，则重新获取
+            // TODO 加入缓存后，更新头像后要更新缓存，如果访问地址准备过期，则重新获取
             // 动态更新当前登录用户基本信息（不涉及用户名、密码和角色），不需要让用户重新登录
             HrUtil.updateCurrentHrBasicInfo(hr);
             // 返回文件访问地址

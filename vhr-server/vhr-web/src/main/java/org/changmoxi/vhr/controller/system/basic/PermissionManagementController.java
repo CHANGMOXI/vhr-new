@@ -1,6 +1,7 @@
 package org.changmoxi.vhr.controller.system.basic;
 
 import org.changmoxi.vhr.common.RespBean;
+import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.Role;
 import org.changmoxi.vhr.service.MenuService;
 import org.changmoxi.vhr.service.RoleService;
@@ -28,7 +29,7 @@ public class PermissionManagementController {
      */
     @GetMapping("/roles")
     public RespBean getAllRoles() {
-        return roleService.getAllRoles();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, roleService.getAllRoles());
     }
 
     /**
@@ -38,7 +39,7 @@ public class PermissionManagementController {
      */
     @GetMapping("/menus")
     public RespBean getAllMenus() {
-        return menuService.getAllMenus();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuService.getAllMenus());
     }
 
     /**
@@ -49,7 +50,7 @@ public class PermissionManagementController {
      */
     @GetMapping("/mids/{rid}")
     public RespBean getEnabledMIdsByRId(@PathVariable("rid") Integer rId) {
-        return menuService.getEnabledMIdsByRId(rId);
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, menuService.getEnabledMIdsByRId(rId));
     }
 
     /**

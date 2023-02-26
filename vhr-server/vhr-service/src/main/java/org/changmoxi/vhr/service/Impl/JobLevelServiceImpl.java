@@ -8,6 +8,9 @@ import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.JobLevelMapper;
 import org.changmoxi.vhr.model.JobLevel;
 import org.changmoxi.vhr.service.JobLevelService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,11 +29,15 @@ public class JobLevelServiceImpl implements JobLevelService {
     private JobLevelMapper jobLevelMapper;
 
     @Override
-    public RespBean getAllJobLevels() {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, jobLevelMapper.getAllJobLevels());
+    @Cacheable(cacheNames = "joblevel", key = "'all.joblevels'")
+    public List<JobLevel> getAllJobLevels() {
+        return jobLevelMapper.getAllJobLevels();
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "joblevel", key = "'all.joblevels'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.fixedinfo'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean addJobLevel(JobLevel jobLevel) {
         if (Objects.isNull(jobLevel) || StringUtils.isAnyBlank(jobLevel.getName(), jobLevel.getTitleLevel())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "jobLevel传参不能为空 或 name字段或titleLevel字段不能为空");
@@ -45,6 +52,9 @@ public class JobLevelServiceImpl implements JobLevelService {
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "joblevel", key = "'all.joblevels'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.fixedinfo'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean updateJobLevel(JobLevel jobLevel) {
         if (ObjectUtils.anyNull(jobLevel, jobLevel.getId(), jobLevel.getEnabled()) || StringUtils.isAnyBlank(jobLevel.getName(), jobLevel.getTitleLevel())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "position传参 或 id、name、titleLevel、enabled字段不能为空");
@@ -63,8 +73,10 @@ public class JobLevelServiceImpl implements JobLevelService {
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "joblevel", key = "'all.joblevels'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.fixedinfo'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean batchDeleteJobLevels(Integer[] ids) {
-        //TODO 查询方法可能还需要考虑到以后可能会给employee表添加的deleted字段
         List<Integer> existEmployeeJobLevelIdList = jobLevelMapper.getExistEmployeeJobLevelIdsByIds(ids);
         int size = existEmployeeJobLevelIdList.size();
         if (size == ids.length) {

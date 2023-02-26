@@ -2,6 +2,7 @@ package org.changmoxi.vhr.service.Impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.changmoxi.vhr.common.RespBean;
@@ -16,6 +17,8 @@ import org.changmoxi.vhr.mapper.*;
 import org.changmoxi.vhr.model.*;
 import org.changmoxi.vhr.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
  * @author CZS
  * @create 2023-01-17 21:29
  **/
+@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
     @Resource
@@ -56,7 +60,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     private MailProducer mailProducer;
 
     @Override
-    public RespBean getEmployeesByPage(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
+    @Cacheable(cacheNames = "employee:page", key = "'employees.page:' + #pageNum + '.' + #pageSize")
+    public PageInfo<Employee> getEmployeesByPage(Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Employee> employees = employeeMapper.getEmployees(null);
+        PageInfo<Employee> pageInfo = new PageInfo<>(employees);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo<Employee> getEmployeesByPageAndSearch(Integer pageNum, Integer pageSize, EmployeeSearchDTO employeeSearchDTO) {
         if (ArrayUtils.isNotEmpty(employeeSearchDTO.getEmploymentDateScope()) && employeeSearchDTO.getEmploymentDateScope().length == 1) {
             if (StringUtils.equals("null", employeeSearchDTO.getEmploymentDateScope()[0])) {
                 employeeSearchDTO.setEmploymentDateScope(null);
@@ -70,13 +83,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         PageHelper.startPage(pageNum, pageSize);
         List<Employee> employees = employeeMapper.getEmployees(employeeSearchDTO);
         PageInfo<Employee> pageInfo = new PageInfo<>(employees);
-        return RespBean.page(CustomizeStatusCode.SUCCESS, pageInfo);
+        return pageInfo;
     }
 
     @Override
-    public RespBean addEmployee(Employee employee) {
+    public int addEmployee(Employee employee) {
         employee.CalculateContractTerm();
-        employee.setSalaryId(getSalaryIdByDepartmentId(employee.getDepartmentId()));
         int insertCount = employeeMapper.insertSelective(employee);
         if (insertCount == 1) {
             Employee insertEmployee = employeeMapper.getEmployeeAllInfoById(employee.getId());
@@ -85,11 +97,11 @@ public class EmployeeServiceImpl implements EmployeeService {
             BeanUtils.copyProperties(insertEmployee, employeeMailDTO);
             mailProducer.sendWelcomeMail(employeeMailDTO);
         }
-        return insertCount == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_ADD) : RespBean.error(CustomizeStatusCode.ERROR_ADD);
+        return insertCount;
     }
 
     @Override
-    // TODO 加入缓存，数据修改时更新缓存
+    @Cacheable(cacheNames = "employee", key = "'employee.fixedinfo'")
     public Map<String, List<?>> getFixedInfo() {
         Map<String, List<?>> result = new HashMap<>();
         List<Nation> nations = nationMapper.getAllNations();
@@ -104,6 +116,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Cacheable(cacheNames = "position", key = "'all.positions'")
     public List<Position> getPositions() {
         return positionMapper.getAllPositions();
     }
@@ -114,20 +127,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public RespBean deleteEmployee(Integer id) {
+    public int deleteEmployee(Integer id) {
         Employee employee = new Employee();
         employee.setId(id);
         employee.setDeleted(true);
-        return employeeMapper.updateByPrimaryKeySelective(employee) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_DELETE) : RespBean.error(CustomizeStatusCode.ERROR_DELETE);
+        return employeeMapper.updateByPrimaryKeySelective(employee);
     }
 
     @Override
-    public RespBean updateEmployee(Employee employee) {
+    public int updateEmployee(Employee employee) {
         if (Objects.isNull(employee.getId())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id字段不能为空");
         }
         employee.CalculateContractTerm();
-        return employeeMapper.updateByPrimaryKeySelective(employee) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+        return employeeMapper.updateByPrimaryKeySelective(employee);
     }
 
     @Override
@@ -152,12 +165,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    // TODO nations、politicsStatuses、jobLevels、departments加入缓存，数据修改时更新缓存
+    @Cacheable(cacheNames = "employee", key = "'employee.all.id.maps'")
     public Map<String, Map<String, Integer>> getAllIdMaps() {
         List<Nation> nations = nationMapper.getAllNations();
         List<PoliticsStatus> politicsStatuses = politicsStatusMapper.getAllPoliticsStatuses();
         List<Department> departments = departmentMapper.getAllDepartments();
-        List<Position> positions = getPositions();
+        List<Position> positions = positionMapper.getAllPositions();
         List<JobLevel> jobLevels = jobLevelMapper.getAllJobLevels();
 
         Map<String, Map<String, Integer>> allIdMaps = new HashMap<>();
@@ -180,33 +193,50 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Integer getSalaryIdByDepartmentId(Integer departmentId) {
-        // TODO departmentIdToSalaryIdMap 加入缓存，避免大量员工新增时反复查询，修改salary表和删除department表记录时，更新缓存
+    @Cacheable(cacheNames = "employee", key = "'employee.departmentid.to.salaryid.map'")
+    public Map<Integer, Integer> getDepartmentIdToSalaryIdMap() {
         List<Salary> salaries = salaryMapper.getAllSalaries();
-        Map<Integer, Integer> departmentIdToSalaryIdMap = salaries.stream().collect(Collectors.toMap(Salary::getDepartmentId, Salary::getId));
-        if (departmentIdToSalaryIdMap.containsKey(departmentId)) {
-            return departmentIdToSalaryIdMap.get(departmentId);
-        }
-        return null;
+        return salaries.stream().collect(Collectors.toMap(Salary::getDepartmentId, Salary::getId));
     }
 
     @Override
-    public RespBean getEmployeeSalaries(Integer pageNum, Integer pageSize) {
+    @Cacheable(cacheNames = "employee:page", key = "'employee.salaries.page:' + #pageNum + '.' + #pageSize")
+    public PageInfo<Employee> getEmployeeSalaries(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         List<Employee> employeeSalaries = employeeMapper.getEmployeeSalaries();
         PageInfo<Employee> pageInfo = new PageInfo<>(employeeSalaries);
-        return RespBean.page(CustomizeStatusCode.SUCCESS, pageInfo);
+        return pageInfo;
     }
 
     @Override
-    public RespBean updateEmployeeSalary(Integer employeeId, Integer salaryId) {
+    public int updateEmployeeSalary(Integer employeeId, Integer salaryId) {
         Integer currentSalaryId = employeeMapper.getSalaryIdById(employeeId);
         if (salaryId.equals(currentSalaryId)) {
-            return RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE);
+            return 1;
         }
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setSalaryId(salaryId);
-        return employeeMapper.updateByPrimaryKeySelective(employee) == 1 ? RespBean.ok(CustomizeStatusCode.SUCCESS_UPDATE) : RespBean.error(CustomizeStatusCode.ERROR_UPDATE);
+        return employeeMapper.updateByPrimaryKeySelective(employee);
+    }
+
+    @Override
+    public Integer getCountLessThanId(Integer id) {
+        return employeeMapper.getCountLessThanId(id);
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "employee:page", key = "'employees.page:' + #pageNum + '.' + #pageSize")
+    public void deleteEmployeesPageCache(Integer pageNum, Integer pageSize) {
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "employee:page", key = "'employee.salaries.page:' + #pageNum + '.' + #pageSize")
+    public void deleteEmployeeSalariesPageCache(Integer pageNum, Integer pageSize) {
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "employee:page", allEntries = true)
+    public void clearAllPageCache() {
     }
 }

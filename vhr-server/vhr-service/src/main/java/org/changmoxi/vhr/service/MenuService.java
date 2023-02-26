@@ -29,7 +29,7 @@ public interface MenuService {
      *
      * @return
      */
-    RespBean getAllMenus();
+    List<Menu> getAllMenus();
 
     /**
      * 获取角色可操作的菜单项id
@@ -37,7 +37,7 @@ public interface MenuService {
      * @param rId
      * @return
      */
-    RespBean getEnabledMIdsByRId(Integer rId);
+    List<Integer> getEnabledMIdsByRId(Integer rId);
 
     /**
      * 更新角色可操作的菜单项id

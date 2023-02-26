@@ -7,9 +7,12 @@ import org.changmoxi.vhr.common.exception.BusinessException;
 import org.changmoxi.vhr.mapper.RoleMapper;
 import org.changmoxi.vhr.model.Role;
 import org.changmoxi.vhr.service.RoleService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,11 +25,13 @@ public class RoleServiceImpl implements RoleService {
     private RoleMapper roleMapper;
 
     @Override
-    public RespBean getAllRoles() {
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, roleMapper.getAllRoles());
+    @Cacheable(cacheNames = "role", key = "'all.roles'")
+    public List<Role> getAllRoles() {
+        return roleMapper.getAllRoles();
     }
 
     @Override
+    @CacheEvict(cacheNames = "role", key = "'all.roles'")
     public RespBean addRole(Role role) {
         if (Objects.isNull(role) || StringUtils.isAnyBlank(role.getName(), role.getNameZh())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "角色role 或 name、nameZh字段不能为空");
@@ -47,6 +52,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "role", key = "'all.roles'")
     public RespBean deleteRole(Integer rid) {
         if (Objects.isNull(rid)) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "rid不能为空");

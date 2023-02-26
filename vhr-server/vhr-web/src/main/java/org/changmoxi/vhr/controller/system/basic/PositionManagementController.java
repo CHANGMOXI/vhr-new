@@ -28,7 +28,7 @@ public class PositionManagementController {
      */
     @GetMapping("/")
     public RespBean getAllPositions() {
-        return positionService.getAllPositions();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, positionService.getAllPositions());
     }
 
     /**

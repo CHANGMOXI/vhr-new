@@ -1,6 +1,7 @@
 package org.changmoxi.vhr.controller.salary;
 
 import org.changmoxi.vhr.common.RespBean;
+import org.changmoxi.vhr.common.enums.CustomizeStatusCode;
 import org.changmoxi.vhr.model.Salary;
 import org.changmoxi.vhr.service.SalaryService;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class SalaryController {
      */
     @GetMapping("/")
     public RespBean getAllSalaries() {
-        return salaryService.getAllSalaries();
+        return RespBean.ok(CustomizeStatusCode.SUCCESS, salaryService.getAllSalaries());
     }
 
     /**

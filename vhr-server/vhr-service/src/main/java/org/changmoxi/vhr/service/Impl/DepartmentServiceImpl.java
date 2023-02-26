@@ -11,6 +11,9 @@ import org.changmoxi.vhr.mapper.SalaryMapper;
 import org.changmoxi.vhr.model.Department;
 import org.changmoxi.vhr.model.Salary;
 import org.changmoxi.vhr.service.DepartmentService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -33,13 +36,17 @@ public class DepartmentServiceImpl implements DepartmentService {
     private SalaryMapper salaryMapper;
 
     @Override
-    public RespBean getAllDepartments() {
+    @Cacheable(cacheNames = "department", key = "'all.departments'")
+    public List<Department> getAllDepartments() {
         //递归(嵌套)查询
-        return RespBean.ok(CustomizeStatusCode.SUCCESS, departmentMapper.getAllDepartmentsByParentId(-1));
+        return departmentMapper.getAllDepartmentsByParentId(-1);
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
+    @Caching(evict = {@CacheEvict(cacheNames = "department", key = "'all.departments'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.fixedinfo'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean addDepartment(Department department) {
         if (ObjectUtils.anyNull(department, department.getParentId()) || StringUtils.isBlank(department.getName())) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "department传参 或 name、parentId字段不能为空");
@@ -83,6 +90,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Caching(evict = {@CacheEvict(cacheNames = "department", key = "'all.departments'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.fixedinfo'"),
+            @CacheEvict(cacheNames = "salary", key = "'all.salaries'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.departmentid.to.salaryid.map'"),
+            @CacheEvict(cacheNames = "employee", key = "'employee.all.id.maps'")})
     public RespBean deleteDepartment(Integer id) {
         if (Objects.isNull(id)) {
             throw new BusinessException(CustomizeStatusCode.PARAMETER_ERROR, "id不能为空");
